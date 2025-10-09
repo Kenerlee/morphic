@@ -29,9 +29,10 @@ export async function getModels(): Promise<Model[]> {
 
     try {
       const response = await fetch(modelUrl, {
-        cache: 'no-store',
+        cache: 'no-cache', // Always fetch fresh models config
         headers: {
-          Accept: 'application/json'
+          Accept: 'application/json',
+          'Cache-Control': 'no-cache, no-store, must-revalidate'
         }
       })
 

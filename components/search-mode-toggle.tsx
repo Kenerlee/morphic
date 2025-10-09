@@ -1,36 +1,22 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-
 import { Globe } from 'lucide-react'
 
+import { useResearchMode } from '@/lib/hooks/use-research-mode'
+import { useTranslations } from '@/lib/i18n/provider'
 import { cn } from '@/lib/utils'
-import { getCookie, setCookie } from '@/lib/utils/cookies'
 
 import { Toggle } from './ui/toggle'
 
 export function SearchModeToggle() {
-  const [isSearchMode, setIsSearchMode] = useState(true)
-
-  useEffect(() => {
-    const savedMode = getCookie('search-mode')
-    if (savedMode !== null) {
-      setIsSearchMode(savedMode === 'true')
-    } else {
-      setCookie('search-mode', 'true')
-    }
-  }, [])
-
-  const handleSearchModeChange = (pressed: boolean) => {
-    setIsSearchMode(pressed)
-    setCookie('search-mode', pressed.toString())
-  }
+  const t = useTranslations()
+  const { isActive, toggleMode } = useResearchMode('search')
 
   return (
     <Toggle
       aria-label="Toggle search mode"
-      pressed={isSearchMode}
-      onPressedChange={handleSearchModeChange}
+      pressed={isActive}
+      onPressedChange={toggleMode}
       variant="outline"
       className={cn(
         'gap-1 px-3 border border-input text-muted-foreground bg-background',
@@ -41,7 +27,7 @@ export function SearchModeToggle() {
       )}
     >
       <Globe className="size-4" />
-      <span className="text-xs">Search</span>
+      <span className="text-xs">{t('chat.search')}</span>
     </Toggle>
   )
 }

@@ -37,3 +37,5 @@ next-env.d.ts
 
 # temporary files
 .tmp/
+# Local Netlify folder
+.netlify

@@ -24,12 +24,14 @@ export function Chat({
   id,
   savedMessages = [],
   query,
-  models
+  models,
+  user
 }: {
   id: string
   savedMessages?: Message[]
   query?: string
   models?: Model[]
+  user?: any
 }) {
   const scrollContainerRef = useRef<HTMLDivElement>(null)
   const [isAtBottom, setIsAtBottom] = useState(true)
@@ -242,6 +244,7 @@ export function Chat({
         models={models}
         showScrollToBottomButton={!isAtBottom}
         scrollContainerRef={scrollContainerRef}
+        user={user}
       />
     </div>
   )

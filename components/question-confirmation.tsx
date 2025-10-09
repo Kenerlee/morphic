@@ -5,6 +5,8 @@ import { useState } from 'react'
 import { ToolInvocation } from 'ai'
 import { ArrowRight, Check, SkipForward } from 'lucide-react'
 
+import { useTranslations } from '@/lib/i18n/provider'
+
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -26,8 +28,16 @@ export function QuestionConfirmation({
   onConfirm,
   isCompleted = false
 }: QuestionConfirmationProps) {
-  const { question, options, allowsInput, inputLabel, inputPlaceholder } =
-    toolInvocation.args
+  const t = useTranslations()
+
+  const {
+    question,
+    options,
+    allowsInput,
+    inputLabel,
+    inputPlaceholder,
+    inputFields
+  } = toolInvocation.args
 
   // Get result data if available
   const resultData =
@@ -37,11 +47,17 @@ export function QuestionConfirmation({
 
   const [selectedOptions, setSelectedOptions] = useState<string[]>([])
   const [inputText, setInputText] = useState('')
+  const [fieldValues, setFieldValues] = useState<Record<string, string>>({})
   const [completed, setCompleted] = useState(isCompleted)
   const [skipped, setSkipped] = useState(false)
 
   const isButtonDisabled =
-    selectedOptions.length === 0 && (!allowsInput || inputText.trim() === '')
+    inputFields && inputFields.length > 0
+      ? inputFields.some(
+          (field: any) => field.required && !fieldValues[field.name]?.trim()
+        )
+      : selectedOptions.length === 0 &&
+        (!allowsInput || inputText.trim() === '')
 
   const handleOptionChange = (label: string) => {
     setSelectedOptions(prev => {
@@ -63,12 +79,20 @@ export function QuestionConfirmation({
     onConfirm(toolInvocation.toolCallId, false, { skipped: true })
   }
 
+  const handleFieldChange = (fieldName: string, value: string) => {
+    setFieldValues(prev => ({
+      ...prev,
+      [fieldName]: value
+    }))
+  }
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
 
     const response = {
       selectedOptions,
       inputText: inputText.trim(),
+      fieldValues: inputFields ? fieldValues : undefined,
       question
     }
 
@@ -103,17 +127,21 @@ export function QuestionConfirmation({
   const updatedQuery = () => {
     // If skipped, show skipped message
     if (wasSkipped()) {
-      return 'Question skipped'
+      return t('research.questionSkipped')
     }
 
     const displayOptions = getDisplayedOptions()
     const displayInputText = getDisplayedInputText()
 
     const optionsText =
-      displayOptions.length > 0 ? `Selected: ${displayOptions.join(', ')}` : ''
+      displayOptions.length > 0
+        ? `${t('questionConfirmation.selected')}${displayOptions.join(', ')}`
+        : ''
 
     const inputTextDisplay =
-      displayInputText.trim() !== '' ? `Input: ${displayInputText}` : ''
+      displayInputText.trim() !== ''
+        ? `${t('questionConfirmation.input')}${displayInputText}`
+        : ''
 
     return [optionsText, inputTextDisplay].filter(Boolean).join(' | ')
   }
@@ -170,7 +198,96 @@ export function QuestionConfirmation({
               ))}
           </div>
 
-          {allowsInput && (
+          {inputFields && inputFields.length > 0 ? (
+            <div className="mb-6 flex flex-col space-y-4">
+              {/* First row: Target market and Industry side by side */}
+              {inputFields.length >= 4 && (
+                <div className="grid grid-cols-2 gap-4">
+                  {/* Target market (index 0) */}
+                  <div className="flex flex-col space-y-2 text-sm">
+                    <label
+                      className="text-muted-foreground font-medium"
+                      htmlFor={inputFields[0].name}
+                    >
+                      {inputFields[0].label}
+                      {inputFields[0].required && (
+                        <span className="text-red-500 ml-1">*</span>
+                      )}
+                    </label>
+                    <Input
+                      type="text"
+                      name={inputFields[0].name}
+                      className="w-full"
+                      id={inputFields[0].name}
+                      placeholder={inputFields[0].placeholder}
+                      value={fieldValues[inputFields[0].name] || ''}
+                      onChange={e =>
+                        handleFieldChange(inputFields[0].name, e.target.value)
+                      }
+                      required={inputFields[0].required}
+                    />
+                  </div>
+                  {/* Industry (index 3) */}
+                  <div className="flex flex-col space-y-2 text-sm">
+                    <label
+                      className="text-muted-foreground font-medium"
+                      htmlFor={inputFields[3].name}
+                    >
+                      {inputFields[3].label}
+                      {inputFields[3].required && (
+                        <span className="text-red-500 ml-1">*</span>
+                      )}
+                    </label>
+                    <Input
+                      type="text"
+                      name={inputFields[3].name}
+                      className="w-full"
+                      id={inputFields[3].name}
+                      placeholder={inputFields[3].placeholder}
+                      value={fieldValues[inputFields[3].name] || ''}
+                      onChange={e =>
+                        handleFieldChange(inputFields[3].name, e.target.value)
+                      }
+                      required={inputFields[3].required}
+                    />
+                  </div>
+                </div>
+              )}
+              {/* Remaining fields (Company name, Product/Service, Additional requirements) */}
+              {inputFields
+                .filter(
+                  (field: any, index: number) => index !== 0 && index !== 3
+                )
+                .map((field: any) => (
+                  <div
+                    key={field.name}
+                    className="flex flex-col space-y-2 text-sm"
+                  >
+                    <label
+                      className="text-muted-foreground font-medium"
+                      htmlFor={field.name}
+                    >
+                      {field.label}
+                      {field.required && (
+                        <span className="text-red-500 ml-1">*</span>
+                      )}
+                    </label>
+                    <Input
+                      type="text"
+                      name={field.name}
+                      className="w-full"
+                      id={field.name}
+                      placeholder={field.placeholder}
+                      value={fieldValues[field.name] || ''}
+                      onChange={e =>
+                        handleFieldChange(field.name, e.target.value)
+                      }
+                      required={field.required}
+                    />
+                  </div>
+                ))}
+            </div>
+          ) : allowsInput ? (
             <div className="mb-6 flex flex-col space-y-2 text-sm">
               <label className="text-muted-foreground" htmlFor="query">
                 {inputLabel}
@@ -185,16 +302,16 @@ export function QuestionConfirmation({
                 onChange={handleInputChange}
               />
             </div>
-          )}
+          ) : null}
 
           <div className="flex justify-end space-x-2">
             <Button type="button" variant="outline" onClick={handleSkip}>
               <SkipForward size={16} className="mr-1" />
-              Skip
+              {t('buttons.skip')}
             </Button>
             <Button type="submit" disabled={isButtonDisabled}>
               <ArrowRight size={16} className="mr-1" />
-              Send
+              {t('buttons.send')}
             </Button>
           </div>
         </form>

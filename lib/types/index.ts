@@ -113,3 +113,50 @@ export type SearXNGSearchResults = {
   number_of_results?: number
   query: string
 }
+
+export type MarketDueDiligenceReport = {
+  metadata: {
+    targetMarket: string
+    industry: string
+    productCategory?: string
+    generatedAt: string
+    dataPoints: number
+  }
+  sections: {
+    marketSize: {
+      query: string
+      results: SearchResultItem[]
+      images: SearchResultImage[]
+    }
+    competition: {
+      query: string
+      results: SearchResultItem[]
+      images: SearchResultImage[]
+    }
+    regulatory: {
+      query: string
+      results: SearchResultItem[]
+      images: SearchResultImage[]
+    }
+    consumerTrends: {
+      query: string
+      results: SearchResultItem[]
+      images: SearchResultImage[]
+    }
+    distributionChannels: {
+      query: string
+      results: SearchResultItem[]
+      images: SearchResultImage[]
+    }
+    productOpportunities?: {
+      query: string
+      results: SearchResultItem[]
+      images: SearchResultImage[]
+    } | null
+  }
+  allResults: Array<{
+    query: string
+    results: SearchResultItem[]
+    images: SearchResultImage[]
+  }>
+}

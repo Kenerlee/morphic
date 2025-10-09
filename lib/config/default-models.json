@@ -1,38 +1,6 @@
 {
   "models": [
     {
-      "id": "gpt-4.1",
-      "name": "GPT-4.1",
-      "provider": "OpenAI",
-      "providerId": "openai",
-      "enabled": true,
-      "toolCallType": "native"
-    },
-    {
-      "id": "gpt-4.1-mini",
-      "name": "GPT-4.1 mini",
-      "provider": "OpenAI",
-      "providerId": "openai",
-      "enabled": true,
-      "toolCallType": "native"
-    },
-    {
-      "id": "gpt-4.1-nano",
-      "name": "GPT-4.1 nano",
-      "provider": "OpenAI",
-      "providerId": "openai",
-      "enabled": true,
-      "toolCallType": "native"
-    },
-    {
-      "id": "o3-mini",
-      "name": "o3 mini",
-      "provider": "OpenAI",
-      "providerId": "openai",
-      "enabled": true,
-      "toolCallType": "native"
-    },
-    {
       "id": "gpt-4o",
       "name": "GPT-4o",
       "provider": "OpenAI",
@@ -49,34 +17,18 @@
       "toolCallType": "native"
     },
     {
-      "id": "claude-3-7-sonnet-20250219",
-      "name": "Claude 3.7 Sonnet",
+      "id": "claude-sonnet-4-5-20250929",
+      "name": "Claude Sonnet 4.5",
       "provider": "Anthropic",
       "providerId": "anthropic",
       "enabled": true,
       "toolCallType": "native"
     },
     {
-      "id": "claude-3-5-sonnet-latest",
-      "name": "Claude 3.5 Sonnet",
+      "id": "claude-sonnet-4-20250514",
+      "name": "Claude Sonnet 4",
       "provider": "Anthropic",
       "providerId": "anthropic",
-      "enabled": true,
-      "toolCallType": "native"
-    },
-    {
-      "id": "claude-3-5-haiku-20241022",
-      "name": "Claude 3.5 Haiku",
-      "provider": "Anthropic",
-      "providerId": "anthropic",
-      "enabled": true,
-      "toolCallType": "native"
-    },
-    {
-      "id": "<AZURE_DEPLOYMENT_NAME>",
-      "name": "<AZURE_DEPLOYMENT_NAME>",
-      "provider": "Azure",
-      "providerId": "azure",
       "enabled": true,
       "toolCallType": "native"
     },
@@ -106,24 +58,7 @@
       "toolCallType": "manual",
       "toolCallModel": "gemini-2.0-flash"
     },
-    {
-      "id": "accounts/fireworks/models/deepseek-r1",
-      "name": "DeepSeek R1",
-      "provider": "Fireworks",
-      "providerId": "fireworks",
-      "enabled": true,
-      "toolCallType": "manual",
-      "toolCallModel": "accounts/fireworks/models/llama-v3p1-8b-instruct"
-    },
-    {
-      "id": "accounts/fireworks/models/llama4-maverick-instruct-basic",
-      "name": "Llama 4 Maverick",
-      "provider": "Fireworks",
-      "providerId": "fireworks",
-      "enabled": true,
-      "toolCallType": "manual",
-      "toolCallModel": "accounts/fireworks/models/llama-v3p1-8b-instruct"
-    },
+
     {
       "id": "deepseek-reasoner",
       "name": "DeepSeek R1",
@@ -179,14 +114,6 @@
       "name": "Grok 3 Beta",
       "provider": "xAI",
       "providerId": "xai",
-      "enabled": true,
-      "toolCallType": "native"
-    },
-    {
-      "id": "<OPENAI_COMPATIBLE_MODEL>",
-      "name": "<OPENAI_COMPATIBLE_MODEL>",
-      "provider": "OpenAI Compatible",
-      "providerId": "openai-compatible",
       "enabled": true,
       "toolCallType": "native"
     }

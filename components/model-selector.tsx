@@ -84,7 +84,7 @@ export function ModelSelector({ models }: ModelSelectorProps) {
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className="text-sm rounded-full shadow-none focus:ring-0"
+          className="text-sm rounded-full shadow-none focus:ring-0 px-3"
         >
           {selectedModel ? (
             <div className="flex items-center space-x-1">
@@ -95,13 +95,18 @@ export function ModelSelector({ models }: ModelSelectorProps) {
                 height={18}
                 className="bg-white rounded-full border"
               />
-              <span className="text-xs font-medium">{selectedModel.name}</span>
               {isReasoningModel(selectedModel.id) && (
                 <Lightbulb size={12} className="text-accent-blue-foreground" />
               )}
             </div>
           ) : (
-            'Select model'
+            <Image
+              src="/providers/logos/openai.svg"
+              alt="Select model"
+              width={18}
+              height={18}
+              className="bg-white rounded-full border"
+            />
           )}
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>

@@ -6,6 +6,8 @@ import {
   streamText
 } from 'ai'
 
+import { deepResearcher } from '@/lib/agents/deep-researcher'
+import { marketDueDiligenceAgent } from '@/lib/agents/market-due-diligence-agent'
 import { researcher } from '@/lib/agents/researcher'
 
 import { getMaxAllowedTokens, truncateMessages } from '../utils/context-window'
@@ -30,7 +32,15 @@ function containsAskQuestionTool(message: CoreMessage) {
 export function createToolCallingStreamResponse(config: BaseStreamConfig) {
   return createDataStreamResponse({
     execute: async (dataStream: DataStreamWriter) => {
-      const { messages, model, chatId, searchMode, userId } = config
+      const {
+        messages,
+        model,
+        chatId,
+        searchMode,
+        dueDiligenceMode,
+        deepResearchMode,
+        userId
+      } = config
       const modelId = `${model.providerId}:${model.id}`
 
       try {
@@ -40,11 +50,21 @@ export function createToolCallingStreamResponse(config: BaseStreamConfig) {
           getMaxAllowedTokens(model)
         )
 
-        let researcherConfig = await researcher({
-          messages: truncatedMessages,
-          model: modelId,
-          searchMode
-        })
+        let researcherConfig = deepResearchMode
+          ? await deepResearcher({
+              messages: truncatedMessages,
+              model: modelId
+            })
+          : dueDiligenceMode
+            ? await marketDueDiligenceAgent({
+                messages: truncatedMessages,
+                model: modelId
+              })
+            : await researcher({
+                messages: truncatedMessages,
+                model: modelId,
+                searchMode
+              })
 
         const result = streamText({
           ...researcherConfig,
@@ -52,6 +72,7 @@ export function createToolCallingStreamResponse(config: BaseStreamConfig) {
             // Check if the last message contains an ask_question tool invocation
             const shouldSkipRelatedQuestions =
               isReasoningModel(modelId) ||
+              deepResearchMode ||
               (result.response.messages.length > 0 &&
                 containsAskQuestionTool(
                   result.response.messages[

@@ -19,13 +19,13 @@ export function createSearchTool(fullModel: string) {
     parameters: getSearchSchemaForModel(fullModel),
     execute: async ({
       query,
-      max_results = 20,
+      max_results = 50,
       search_depth = 'basic', // Default for standard schema
       include_domains = [],
       exclude_domains = []
     }) => {
       // Ensure max_results is at least 10
-      const minResults = 10
+      const minResults = 30
       const effectiveMaxResults = Math.max(
         max_results || minResults,
         minResults

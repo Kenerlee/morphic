@@ -34,6 +34,10 @@ export async function POST(req: Request) {
     const cookieStore = await cookies()
     const modelJson = cookieStore.get('selectedModel')?.value
     const searchMode = cookieStore.get('search-mode')?.value === 'true'
+    const dueDiligenceMode =
+      cookieStore.get('due-diligence-mode')?.value === 'true'
+    const deepResearchMode =
+      cookieStore.get('deep-research-mode')?.value === 'true'
 
     let selectedModel = DEFAULT_MODEL
 
@@ -42,6 +46,28 @@ export async function POST(req: Request) {
         selectedModel = JSON.parse(modelJson) as Model
       } catch (e) {
         console.error('Failed to parse selected model:', e)
+      }
+    }
+
+    // Auto-select Claude Sonnet 4+ for due diligence mode
+    if (dueDiligenceMode) {
+      const isClaude4Plus =
+        selectedModel.id === 'claude-sonnet-4-5-20250929' ||
+        selectedModel.id === 'claude-sonnet-4-20250514'
+
+      if (!isClaude4Plus) {
+        // Override with Claude Sonnet 4.5 as the preferred model
+        selectedModel = {
+          id: 'claude-sonnet-4-5-20250929',
+          name: 'Claude Sonnet 4.5',
+          provider: 'Anthropic',
+          providerId: 'anthropic',
+          enabled: true,
+          toolCallType: 'native'
+        }
+        console.log(
+          'Auto-selected Claude Sonnet 4.5 for market due diligence mode'
+        )
       }
     }
 
@@ -66,6 +92,8 @@ export async function POST(req: Request) {
           model: selectedModel,
           chatId,
           searchMode,
+          dueDiligenceMode,
+          deepResearchMode,
           userId
         })
       : createManualToolStreamResponse({
@@ -73,6 +101,8 @@ export async function POST(req: Request) {
           model: selectedModel,
           chatId,
           searchMode,
+          dueDiligenceMode,
+          deepResearchMode,
           userId
         })
   } catch (error) {

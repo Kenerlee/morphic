@@ -3,7 +3,7 @@ import { CoreMessage } from 'ai'
 import { Model } from '../types/models'
 
 const DEFAULT_CONTEXT_WINDOW = 128_000
-const DEFAULT_RESERVE_TOKENS = 30_000
+const DEFAULT_RESERVE_TOKENS = 80_000 // Increased from 30_000 to support longer outputs (~50k Chinese characters)
 
 export function getMaxAllowedTokens(model: Model): number {
   let contextWindow: number
@@ -11,10 +11,10 @@ export function getMaxAllowedTokens(model: Model): number {
 
   if (model.id.includes('deepseek')) {
     contextWindow = 64_000
-    reserveTokens = 27_000
+    reserveTokens = 50_000 // Increased from 27_000
   } else if (model.id.includes('claude')) {
     contextWindow = 200_000
-    reserveTokens = 40_000
+    reserveTokens = 100_000 // Increased from 40_000 to support very long reports
   } else {
     contextWindow = DEFAULT_CONTEXT_WINDOW
     reserveTokens = DEFAULT_RESERVE_TOKENS

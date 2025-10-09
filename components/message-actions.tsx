@@ -1,11 +1,13 @@
 'use client'
 
 import { useChat } from '@ai-sdk/react'
-import { Copy } from 'lucide-react'
+import { Copy, PencilLine } from 'lucide-react'
 import { toast } from 'sonner'
 
 import { cn } from '@/lib/utils'
+import { markdownToHtml } from '@/lib/utils/markdown-to-html'
 
+import { useEdit } from './edit/edit-context'
 import { Button } from './ui/button'
 import { ChatShare } from './chat-share'
 import { RetryButton } from './retry-button'
@@ -31,10 +33,17 @@ export function MessageActions({
     id: chatId
   })
   const isLoading = status === 'submitted' || status === 'streaming'
+  const { open: openEdit } = useEdit()
 
   async function handleCopy() {
     await navigator.clipboard.writeText(message)
     toast.success('Message copied to clipboard')
+  }
+
+  function handleEdit() {
+    // Convert markdown to HTML for rich text editor
+    const htmlContent = markdownToHtml(message)
+    openEdit(messageId, htmlContent)
   }
 
   return (
@@ -46,6 +55,15 @@ export function MessageActions({
       )}
     >
       {reload && <RetryButton reload={reload} messageId={messageId} />}
+      <Button
+        variant="ghost"
+        size="icon"
+        onClick={handleEdit}
+        className="rounded-full"
+        aria-label="Edit message"
+      >
+        <PencilLine size={14} />
+      </Button>
       <Button
         variant="ghost"
         size="icon"

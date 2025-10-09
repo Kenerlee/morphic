@@ -113,3 +113,69 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Tiptap Editor Styles */
+.prose-editor .ProseMirror {
+  @apply min-h-[400px] p-4 focus:outline-none;
+}
+
+.prose-editor .ProseMirror h1 {
+  @apply text-3xl font-bold mt-6 mb-4;
+}
+
+.prose-editor .ProseMirror h2 {
+  @apply text-2xl font-bold mt-5 mb-3;
+}
+
+.prose-editor .ProseMirror h3 {
+  @apply text-xl font-bold mt-4 mb-2;
+}
+
+.prose-editor .ProseMirror p {
+  @apply my-3;
+}
+
+.prose-editor .ProseMirror ul,
+.prose-editor .ProseMirror ol {
+  @apply my-3 ml-6;
+}
+
+.prose-editor .ProseMirror ul {
+  @apply list-disc;
+}
+
+.prose-editor .ProseMirror ol {
+  @apply list-decimal;
+}
+
+.prose-editor .ProseMirror li {
+  @apply my-1;
+}
+
+.prose-editor .ProseMirror a {
+  @apply text-blue-600 underline hover:text-blue-800;
+}
+
+.prose-editor .ProseMirror strong {
+  @apply font-bold;
+}
+
+.prose-editor .ProseMirror em {
+  @apply italic;
+}
+
+.prose-editor .ProseMirror u {
+  @apply underline;
+}
+
+.prose-editor .ProseMirror code {
+  @apply bg-muted px-1 py-0.5 rounded text-sm font-mono;
+}
+
+.prose-editor .ProseMirror pre {
+  @apply bg-muted p-4 rounded my-3 overflow-x-auto;
+}
+
+.prose-editor .ProseMirror blockquote {
+  @apply border-l-4 border-border pl-4 italic my-3;
+}

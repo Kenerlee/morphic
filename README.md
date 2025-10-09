@@ -1,6 +1,6 @@
-# Morphic
+# 出海罗盘 (ChuhaiLuopan)
 
-An AI-powered search engine with a generative UI.
+AI驱动的出海市场研究与分析平台，为中国企业全球化扩张提供智能决策支持。
 
 ![capture](/public/screenshot-2025-05-04.png)
 

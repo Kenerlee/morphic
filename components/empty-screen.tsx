@@ -1,25 +1,11 @@
+'use client'
+
 import { ArrowRight } from 'lucide-react'
+
+import { useTranslations } from '@/lib/i18n/provider'
 
 import { Button } from '@/components/ui/button'
 
-const exampleMessages = [
-  {
-    heading: 'What is DeepSeek R1?',
-    message: 'What is DeepSeek R1?'
-  },
-  {
-    heading: 'Why is Nvidia growing rapidly?',
-    message: 'Why is Nvidia growing rapidly?'
-  },
-  {
-    heading: 'Tesla vs Rivian',
-    message: 'Tesla vs Rivian'
-  },
-  {
-    heading: 'Summary: https://arxiv.org/pdf/2501.05707',
-    message: 'Summary: https://arxiv.org/pdf/2501.05707'
-  }
-]
 export function EmptyScreen({
   submitMessage,
   className
@@ -27,6 +13,30 @@ export function EmptyScreen({
   submitMessage: (message: string) => void
   className?: string
 }) {
+  const t = useTranslations()
+
+  const exampleMessages = [
+    {
+      heading: t('exampleQuestions.chenXiangGui'),
+      message: t('exampleQuestions.chenXiangGui')
+    },
+    {
+      heading: t('exampleQuestions.herbalX'),
+      message: t('exampleQuestions.herbalX')
+    },
+    {
+      heading: t('exampleQuestions.teslaVsRivian'),
+      message: t('exampleQuestions.teslaVsRivian')
+    },
+    {
+      heading: t('exampleQuestions.toyBookResearch'),
+      message: t('exampleQuestions.toyBookResearch')
+    },
+    {
+      heading: t('exampleQuestions.paperSummary'),
+      message: t('exampleQuestions.paperSummary')
+    }
+  ]
   return (
     <div className={`mx-auto w-full transition-all ${className}`}>
       <div className="bg-background p-2">

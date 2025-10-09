@@ -3,6 +3,7 @@ import { notFound, redirect } from 'next/navigation'
 import { getChat } from '@/lib/actions/chat'
 import { getCurrentUserId } from '@/lib/auth/get-current-user'
 import { getModels } from '@/lib/config/models'
+import { createClient } from '@/lib/supabase/server'
 import { ExtendedCoreMessage, SearchResults } from '@/lib/types' // Added SearchResults
 import { convertToUIMessages } from '@/lib/utils'
 
@@ -75,5 +76,31 @@ export default async function SearchPage(props: {
   }
 
   const models = await getModels()
-  return <Chat key={id} id={id} savedMessages={messages} models={models} />
+
+  // Get current user for auth check
+  let user = null
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+  if (supabaseUrl && supabaseAnonKey) {
+    try {
+      const supabase = await createClient()
+      const {
+        data: { user: currentUser }
+      } = await supabase.auth.getUser()
+      user = currentUser
+    } catch (error) {
+      console.error('Error getting user:', error)
+    }
+  }
+
+  return (
+    <Chat
+      key={id}
+      id={id}
+      savedMessages={messages}
+      models={models}
+      user={user}
+    />
+  )
 }

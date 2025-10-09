@@ -7,12 +7,16 @@ import { useRouter } from 'next/navigation'
 import { Message } from 'ai'
 import { ArrowUp, ChevronDown, MessageCirclePlus, Square } from 'lucide-react'
 
+import { useTranslations } from '@/lib/i18n/provider'
 import { Model } from '@/lib/types/models'
 import { cn } from '@/lib/utils'
 
 import { useArtifact } from './artifact/artifact-context'
 import { Button } from './ui/button'
 import { IconLogo } from './ui/icons'
+import { AuthPromptDialog } from './auth-prompt-dialog'
+import { DeepResearchModeToggle } from './deep-research-mode-toggle'
+import { DueDiligenceModeToggle } from './due-diligence-mode-toggle'
 import { EmptyScreen } from './empty-screen'
 import { ModelSelector } from './model-selector'
 import { SearchModeToggle } from './search-mode-toggle'
@@ -32,6 +36,8 @@ interface ChatPanelProps {
   showScrollToBottomButton: boolean
   /** Reference to the scroll container */
   scrollContainerRef: React.RefObject<HTMLDivElement>
+  /** Current user (null if not logged in) */
+  user?: any
 }
 
 export function ChatPanel({
@@ -46,9 +52,12 @@ export function ChatPanel({
   append,
   models,
   showScrollToBottomButton,
-  scrollContainerRef
+  scrollContainerRef,
+  user
 }: ChatPanelProps) {
+  const t = useTranslations()
   const [showEmptyScreen, setShowEmptyScreen] = useState(false)
+  const [showAuthDialog, setShowAuthDialog] = useState(false)
   const router = useRouter()
   const inputRef = useRef<HTMLTextAreaElement>(null)
   const isFirstRender = useRef(true)
@@ -110,6 +119,20 @@ export function ChatPanel({
     }
   }
 
+  // Handle submit with auth check
+  const onSubmitWithAuthCheck = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+
+    // Check if user is logged in
+    if (!user) {
+      setShowAuthDialog(true)
+      return
+    }
+
+    // User is logged in, proceed with normal submit
+    handleSubmit(e)
+  }
+
   return (
     <div
       className={cn(
@@ -117,16 +140,20 @@ export function ChatPanel({
         messages.length > 0 ? 'sticky bottom-0 px-2 pb-4' : 'px-6'
       )}
     >
+      <AuthPromptDialog
+        open={showAuthDialog}
+        onOpenChange={setShowAuthDialog}
+      />
       {messages.length === 0 && (
         <div className="mb-10 flex flex-col items-center gap-4">
           <IconLogo className="size-12 text-muted-foreground" />
           <p className="text-center text-3xl font-semibold">
-            How can I help you today?
+            {t('chat.howCanIHelpYou')}
           </p>
         </div>
       )}
       <form
-        onSubmit={handleSubmit}
+        onSubmit={onSubmitWithAuthCheck}
         className={cn('max-w-3xl w-full mx-auto relative')}
       >
         {/* Scroll to bottom button - only shown when showScrollToBottomButton is true */}
@@ -137,7 +164,7 @@ export function ChatPanel({
             size="icon"
             className="absolute -top-10 right-4 z-20 size-8 rounded-full shadow-md"
             onClick={handleScrollToBottom}
-            title="Scroll to bottom"
+            title={t('chat.scrollToBottom')}
           >
             <ChevronDown size={16} />
           </Button>
@@ -152,7 +179,7 @@ export function ChatPanel({
             tabIndex={0}
             onCompositionStart={handleCompositionStart}
             onCompositionEnd={handleCompositionEnd}
-            placeholder="Ask a question..."
+            placeholder={t('chat.askAQuestion')}
             spellCheck={false}
             value={input}
             disabled={isLoading || isToolInvocationInProgress()}
@@ -186,6 +213,8 @@ export function ChatPanel({
             <div className="flex items-center gap-2">
               <ModelSelector models={models || []} />
               <SearchModeToggle />
+              <DueDiligenceModeToggle />
+              <DeepResearchModeToggle />
             </div>
             <div className="flex items-center gap-2">
               {messages.length > 0 && (
