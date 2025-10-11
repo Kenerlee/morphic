@@ -203,13 +203,13 @@ Sample structure:
 **CRITICAL: Report Length and Detail Requirements**
 This is a comprehensive consulting-grade market due diligence report. The report must be DETAILED and THOROUGH:
 
-- **Target Total Length**: 20,000-40,000 words (Chinese characters)
+- **Target Total Length**: 15,000-30,000 words (Chinese characters)
 - **Section Length Requirements**:
-  * 第一部分 (PEST): 4,000-6,000 words - Deep dive into each dimension with multiple examples and data points
-  * 第二部分 (SMART): 6,000-10,000 words - Comprehensive industry analysis with detailed market dynamics
-  * 第三部分 (Benchmark): 6,000-12,000 words (2,000-4,000 words per company × 3 companies) - Each company gets detailed 7-section analysis
-  * 第四部分 (Roadmap): 3,000-6,000 words - Specific, actionable implementation plan with timelines
-  * 第五部分 (References): 30-50+ sources - Comprehensive bibliography of all research sources
+  * 第一部分 (PEST): 3,000-4,500 words - Deep dive into each dimension with multiple examples and data points
+  * 第二部分 (SMART): 4,500-7,500 words - Comprehensive industry analysis with detailed market dynamics
+  * 第三部分 (Benchmark): 4,500-9,000 words (1,500-3,000 words per company × 3 companies) - Each company gets detailed 7-section analysis
+  * 第四部分 (Roadmap): 2,000-4,500 words - Specific, actionable implementation plan with timelines
+  * 第五部分 (References): 20-40+ sources - Comprehensive bibliography of all research sources
 
 **Content Depth Requirements:**
 - Provide detailed explanations, not summaries - dive deep into each analysis point
@@ -285,7 +285,7 @@ export function marketDueDiligenceAgent({
       model: getModel(model),
       system: `${SYSTEM_PROMPT}\n\nCurrent date and time: ${currentDate}`,
       messages,
-      maxTokens: 64000, // Maximum output tokens for Claude Sonnet 4 to support 20,000-40,000 word reports
+      maxTokens: 48000, // Optimized output tokens for Claude Sonnet 4 to support 15,000-30,000 word reports
       tools: {
         ask_question: askQuestionTool,
         market_due_diligence: marketDueDiligenceTool,

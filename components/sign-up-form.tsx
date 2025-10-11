@@ -19,10 +19,19 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { PasswordInput } from '@/components/ui/password-input'
 
-export function SignUpForm({
-  className,
-  ...props
-}: React.ComponentPropsWithoutRef<'div'>) {
+interface SignUpFormProps extends React.ComponentPropsWithoutRef<'div'> {
+  messages: any
+}
+
+export function SignUpForm({ className, messages, ...props }: SignUpFormProps) {
+  const t = (key: string) => {
+    const keys = key.split('.')
+    let value: any = messages
+    for (const k of keys) {
+      value = value?.[k]
+    }
+    return value || key
+  }
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [repeatPassword, setRepeatPassword] = useState('')
@@ -37,7 +46,7 @@ export function SignUpForm({
     setError(null)
 
     if (password !== repeatPassword) {
-      setError('Passwords do not match')
+      setError(t('auth.passwordsDoNotMatch'))
       setIsLoading(false)
       return
     }
@@ -68,21 +77,21 @@ export function SignUpForm({
         <CardHeader className="text-center">
           <CardTitle className="text-2xl flex flex-col items-center justify-center gap-4">
             <IconLogo className="size-12" />
-            Create an account
+            {t('auth.createAccount')}
           </CardTitle>
           <CardDescription>
-            Enter your details below to get started
+            {t('auth.enterDetailsToGetStarted')}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSignUp}>
             <div className="flex flex-col gap-4">
               <div className="grid gap-2">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email">{t('auth.email')}</Label>
                 <Input
                   id="email"
                   type="email"
-                  placeholder="you@example.com"
+                  placeholder={t('placeholders.emailPlaceholder')}
                   required
                   value={email}
                   onChange={e => setEmail(e.target.value)}
@@ -90,12 +99,12 @@ export function SignUpForm({
               </div>
               <div className="grid gap-2">
                 <div className="flex items-center">
-                  <Label htmlFor="password">Password</Label>
+                  <Label htmlFor="password">{t('auth.password')}</Label>
                 </div>
                 <PasswordInput
                   id="password"
                   type="password"
-                  placeholder="********"
+                  placeholder={t('placeholders.passwordPlaceholder')}
                   required
                   value={password}
                   onChange={e => setPassword(e.target.value)}
@@ -103,12 +112,12 @@ export function SignUpForm({
               </div>
               <div className="grid gap-2">
                 <div className="flex items-center">
-                  <Label htmlFor="repeat-password">Repeat Password</Label>
+                  <Label htmlFor="repeat-password">{t('auth.repeatPassword')}</Label>
                 </div>
                 <PasswordInput
                   id="repeat-password"
                   type="password"
-                  placeholder="********"
+                  placeholder={t('placeholders.passwordPlaceholder')}
                   required
                   value={repeatPassword}
                   onChange={e => setRepeatPassword(e.target.value)}
@@ -116,13 +125,13 @@ export function SignUpForm({
               </div>
               {error && <p className="text-sm text-red-500">{error}</p>}
               <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? 'Creating account...' : 'Sign Up'}
+                {isLoading ? t('auth.creatingAccount') : t('auth.signUp')}
               </Button>
             </div>
             <div className="mt-6 text-center text-sm">
-              Already have an account?{' '}
+              {t('auth.alreadyHaveAccount')}{' '}
               <Link href="/auth/login" className="underline underline-offset-4">
-                Sign In
+                {t('auth.signIn')}
               </Link>
             </div>
           </form>
@@ -130,7 +139,7 @@ export function SignUpForm({
       </Card>
       <div className="text-center text-xs text-muted-foreground">
         <Link href="/" className="hover:underline">
-          &larr; Back to Home
+          {t('auth.backToHome')}
         </Link>
       </div>
     </div>

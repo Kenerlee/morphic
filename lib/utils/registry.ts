@@ -1,10 +1,10 @@
-import { anthropic } from '@ai-sdk/anthropic'
+import { createAnthropic } from '@ai-sdk/anthropic'
 import { createAzure } from '@ai-sdk/azure'
 import { deepseek } from '@ai-sdk/deepseek'
 import { createFireworks, fireworks } from '@ai-sdk/fireworks'
 import { google } from '@ai-sdk/google'
 import { groq } from '@ai-sdk/groq'
-import { createOpenAI, openai } from '@ai-sdk/openai'
+import { createOpenAI } from '@ai-sdk/openai'
 import { xai } from '@ai-sdk/xai'
 import {
   createProviderRegistry,
@@ -13,9 +13,21 @@ import {
 } from 'ai'
 import { createOllama } from 'ollama-ai-provider'
 
+// Create custom OpenAI provider with optional baseURL override
+const customOpenAI = createOpenAI({
+  baseURL: process.env.OPENAI_BASE_URL || 'https://api.openai.com/v1',
+  apiKey: process.env.OPENAI_API_KEY
+})
+
+// Create custom Anthropic provider with optional baseURL override
+const customAnthropic = createAnthropic({
+  baseURL: process.env.ANTHROPIC_BASE_URL || 'https://api.anthropic.com/v1',
+  apiKey: process.env.ANTHROPIC_API_KEY
+})
+
 export const registry = createProviderRegistry({
-  openai,
-  anthropic,
+  openai: customOpenAI,
+  anthropic: customAnthropic,
   google,
   groq,
   ollama: createOllama({

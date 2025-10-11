@@ -67,13 +67,18 @@ export default async function RootLayout({
     user = supabaseUser
   }
 
-  // Get locale from cookie, default to 'en'
+  // Get locale from cookie, default to 'zh' (Chinese)
   const cookieStore = await cookies()
-  const locale = cookieStore.get('NEXT_LOCALE')?.value || 'en'
+  const locale = cookieStore.get('NEXT_LOCALE')?.value || 'zh'
   const messages = locale === 'zh' ? zhMessages : enMessages
 
   return (
     <html lang={locale} suppressHydrationWarning>
+      <head>
+        {/* Preconnect to own domain for faster asset loading */}
+        <link rel="preconnect" href="https://navix2025.moments.top" />
+        <link rel="dns-prefetch" href="https://navix2025.moments.top" />
+      </head>
       <body
         className={cn(
           'min-h-screen flex flex-col font-sans antialiased',

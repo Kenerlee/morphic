@@ -6,6 +6,7 @@ import { MoreHorizontal, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
 
 import { clearChats } from '@/lib/actions/chat'
+import { useTranslations } from '@/lib/i18n/provider'
 
 import {
   AlertDialog,
@@ -32,13 +33,14 @@ interface ClearHistoryActionProps {
 }
 
 export function ClearHistoryAction({ empty }: ClearHistoryActionProps) {
+  const t = useTranslations()
   const [isPending, start] = useTransition()
   const [open, setOpen] = useState(false)
 
   const onClear = () =>
     start(async () => {
       const res = await clearChats()
-      res?.error ? toast.error(res.error) : toast.success('History cleared')
+      res?.error ? toast.error(res.error) : toast.success(t('toasts.historyCleared'))
       setOpen(false)
       window.dispatchEvent(new CustomEvent('chat-history-updated'))
     })
@@ -48,7 +50,7 @@ export function ClearHistoryAction({ empty }: ClearHistoryActionProps) {
       <DropdownMenuTrigger asChild>
         <SidebarGroupAction disabled={empty} className="static size-7 p-1">
           <MoreHorizontal size={16} />
-          <span className="sr-only">History Actions</span>
+          <span className="sr-only">{t('history.historyActions')}</span>
         </SidebarGroupAction>
       </DropdownMenuTrigger>
 
@@ -60,22 +62,21 @@ export function ClearHistoryAction({ empty }: ClearHistoryActionProps) {
               className="gap-2 text-destructive focus:text-destructive"
               onSelect={event => event.preventDefault()} // Prevent closing dropdown
             >
-              <Trash2 size={14} /> Clear History
+              <Trash2 size={14} /> {t('history.clearHistory')}
             </DropdownMenuItem>
           </AlertDialogTrigger>
 
           <AlertDialogContent>
             <AlertDialogHeader>
-              <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+              <AlertDialogTitle>{t('history.areYouAbsolutelySure')}</AlertDialogTitle>
               <AlertDialogDescription>
-                This action cannot be undone. It will permanently delete your
-                history.
+                {t('history.deleteHistoryWarning')}
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel disabled={isPending}>Cancel</AlertDialogCancel>
+              <AlertDialogCancel disabled={isPending}>{t('buttons.cancel')}</AlertDialogCancel>
               <AlertDialogAction disabled={isPending} onClick={onClear}>
-                {isPending ? <Spinner /> : 'Clear'}
+                {isPending ? <Spinner /> : t('buttons.clear')}
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>

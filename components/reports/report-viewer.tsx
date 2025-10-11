@@ -1,18 +1,32 @@
 'use client'
 
 import { useState } from 'react'
+import dynamic from 'next/dynamic'
 import { useRouter } from 'next/navigation'
 
 import { format } from 'date-fns'
 import { zhCN } from 'date-fns/locale'
-import { ChevronDown, Download, Edit, Save } from 'lucide-react'
+import { ChevronDown, Download, Edit, Loader2, Save } from 'lucide-react'
 import { toast } from 'sonner'
 
 import { Report } from '@/lib/types/report'
-import { exportToPDF } from '@/lib/utils/export-enhanced-pdf'
-import { exportToWord } from '@/lib/utils/export-enhanced-word'
 
-import { EnhancedRichTextEditor } from '../edit/enhanced-rich-text-editor'
+// Dynamically import heavy components
+const EnhancedRichTextEditor = dynamic(
+  () =>
+    import('../edit/enhanced-rich-text-editor').then(
+      mod => mod.EnhancedRichTextEditor
+    ),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="flex items-center justify-center h-full">
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      </div>
+    )
+  }
+)
+
 import { Button } from '../ui/button'
 import {
   DropdownMenu,
@@ -66,6 +80,8 @@ export function ReportViewer({ report: initialReport }: ReportViewerProps) {
   const handleExportPDF = async () => {
     setIsExporting(true)
     try {
+      // Dynamically import PDF export library only when needed
+      const { exportToPDF } = await import('@/lib/utils/export-enhanced-pdf')
       await exportToPDF({
         title: report.title,
         content: report.content,
@@ -83,6 +99,8 @@ export function ReportViewer({ report: initialReport }: ReportViewerProps) {
   const handleExportWord = async () => {
     setIsExporting(true)
     try {
+      // Dynamically import Word export library only when needed
+      const { exportToWord } = await import('@/lib/utils/export-enhanced-word')
       await exportToWord({
         title: report.title,
         content: report.content,

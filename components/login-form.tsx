@@ -4,7 +4,6 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 
-import { useTranslations } from '@/lib/i18n/provider'
 import { createClient } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils/index'
 
@@ -19,14 +18,21 @@ import {
 import { IconLogo } from '@/components/ui/icons'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { PasswordInput } from '@/components/ui/password-input'
 
-import { PasswordInput } from './ui/password-input'
+interface LoginFormProps extends React.ComponentPropsWithoutRef<'div'> {
+  messages: any
+}
 
-export function LoginForm({
-  className,
-  ...props
-}: React.ComponentPropsWithoutRef<'div'>) {
-  const t = useTranslations()
+export function LoginForm({ className, messages, ...props }: LoginFormProps) {
+  const t = (key: string) => {
+    const keys = key.split('.')
+    let value: any = messages
+    for (const k of keys) {
+      value = value?.[k]
+    }
+    return value || key
+  }
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
@@ -125,7 +131,7 @@ export function LoginForm({
                 <Input
                   id="email"
                   type="email"
-                  placeholder="you@example.com"
+                  placeholder={t('placeholders.emailPlaceholder')}
                   required
                   value={email}
                   onChange={e => setEmail(e.target.value)}
@@ -144,7 +150,7 @@ export function LoginForm({
                 <PasswordInput
                   id="password"
                   type="password"
-                  placeholder="********"
+                  placeholder={t('placeholders.passwordPlaceholder')}
                   required
                   value={password}
                   onChange={e => setPassword(e.target.value)}

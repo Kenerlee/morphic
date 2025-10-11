@@ -12,6 +12,11 @@ import { cn } from '@/lib/utils'
 
 import { ChatMessages } from './chat-messages'
 import { ChatPanel } from './chat-panel'
+import {
+  DUE_DILIGENCE_TASKS,
+  ReportGenerationProgress,
+  type TaskId
+} from './report-generation-progress'
 
 // Define section structure
 interface ChatSection {
@@ -35,6 +40,9 @@ export function Chat({
 }) {
   const scrollContainerRef = useRef<HTMLDivElement>(null)
   const [isAtBottom, setIsAtBottom] = useState(true)
+  const [completedTasks, setCompletedTasks] = useState<TaskId[]>([])
+  const [currentTask, setCurrentTask] = useState<TaskId>('pest')
+  const [isDueDiligenceActive, setIsDueDiligenceActive] = useState(false)
 
   const {
     messages,
@@ -124,6 +132,16 @@ export function Chat({
     return () => container.removeEventListener('scroll', handleScroll)
   }, [])
 
+  // Auto-scroll to bottom when messages update (for streaming content)
+  useEffect(() => {
+    if (isAtBottom && scrollContainerRef.current) {
+      scrollContainerRef.current.scrollTo({
+        top: scrollContainerRef.current.scrollHeight,
+        behavior: 'smooth'
+      })
+    }
+  }, [messages, isAtBottom])
+
   // Scroll to the section when a new user message is sent
   useEffect(() => {
     // Only scroll if this chat is currently visible in the URL
@@ -148,6 +166,74 @@ export function Chat({
     setMessages(savedMessages)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id])
+
+  // Detect if due diligence tool is active and track task completion
+  useEffect(() => {
+    // Check if market_due_diligence tool is being used
+    const hasDueDiligenceTool =
+      data &&
+      Array.isArray(data) &&
+      data.some(
+        (item: any) =>
+          item.type === 'tool_call' &&
+          item.data?.toolName === 'market_due_diligence'
+      )
+
+    setIsDueDiligenceActive(hasDueDiligenceTool || false)
+
+    // Only track tasks if due diligence is active
+    if (!hasDueDiligenceTool || !messages.length) return
+
+    // 收集所有助手消息内容
+    const allContent = messages
+      .filter(m => m.role === 'assistant')
+      .map(m => m.content)
+      .join('\n')
+
+    const newCompletedTasks: TaskId[] = []
+
+    // 使用正则匹配markdown标题，避免误判正文中提到的部分名称
+    const pestStarted = /##?\s*第一部分/.test(allContent)
+    const smartStarted = /##?\s*第二部分/.test(allContent)
+    const benchmarkStarted = /##?\s*第三部分/.test(allContent)
+    const roadmapStarted = /##?\s*第四部分/.test(allContent)
+    const referencesStarted = /##?\s*(第五部分|参考)/.test(allContent)
+
+    // 完成判断：下一部分开始了，上一部分才算完成
+    // 这样可以避免AI刚写标题就标记为完成，确保内容真正写完
+    if (pestStarted && smartStarted) {
+      newCompletedTasks.push('pest')
+    }
+    if (smartStarted && benchmarkStarted) {
+      newCompletedTasks.push('smart')
+    }
+    if (benchmarkStarted && roadmapStarted) {
+      newCompletedTasks.push('benchmark')
+    }
+    if (roadmapStarted && referencesStarted) {
+      newCompletedTasks.push('roadmap')
+    }
+    if (referencesStarted && !isLoading) {
+      newCompletedTasks.push('references')
+    }
+
+    // 如果前5个任务都完成且不在加载中，标记最终任务完成
+    if (!isLoading && newCompletedTasks.length >= 5) {
+      newCompletedTasks.push('finalize')
+    }
+
+    setCompletedTasks(newCompletedTasks)
+
+    // 设置当前任务为下一个未完成的任务
+    const nextTask = DUE_DILIGENCE_TASKS.find(
+      task => !newCompletedTasks.includes(task.id)
+    )
+    if (nextTask) {
+      setCurrentTask(nextTask.id)
+    } else {
+      setCurrentTask('finalize')
+    }
+  }, [messages, data, isLoading])
 
   const onQuerySelect = (query: string) => {
     append({
@@ -231,6 +317,19 @@ export function Chat({
         onUpdateMessage={handleUpdateAndReloadMessage}
         reload={handleReloadFrom}
       />
+      {/* Progress Indicator - Only show for due diligence, above ChatPanel */}
+      {isDueDiligenceActive &&
+        messages.length > 0 &&
+        completedTasks.length > 0 &&
+        currentTask !== 'finalize' && (
+          <div className="max-w-3xl mx-auto px-4 pb-2">
+            <ReportGenerationProgress
+              completedTasks={completedTasks}
+              currentTask={currentTask}
+              totalTasks={6}
+            />
+          </div>
+        )}
       <ChatPanel
         input={input}
         handleInputChange={handleInputChange}

@@ -37,10 +37,16 @@ export class RedisWrapper {
       result = await this.client.zrange(key, start, stop, options)
     } else {
       const redisClient = this.client as RedisClientType
-      if (options?.rev) {
-        result = await redisClient.zRange(key, start, stop, { REV: true })
-      } else {
-        result = await redisClient.zRange(key, start, stop)
+      try {
+        if (options?.rev) {
+          // Use ZREVRANGE for reverse order in Redis 6.x
+          result = await redisClient.sendCommand(['ZREVRANGE', key, String(start), String(stop)]) as string[]
+        } else {
+          result = await redisClient.zRange(key, start, stop)
+        }
+      } catch (error) {
+        // Return empty array if key doesn't exist
+        result = []
       }
     }
     return result
@@ -53,7 +59,24 @@ export class RedisWrapper {
       return this.client.hgetall(key) as Promise<T | null>
     } else {
       const result = await (this.client as RedisClientType).hGetAll(key)
-      return Object.keys(result).length > 0 ? (result as T) : null
+      if (Object.keys(result).length === 0) return null
+
+      // Parse JSON strings back to objects for local Redis
+      const parsed: Record<string, any> = {}
+      for (const [k, v] of Object.entries(result)) {
+        try {
+          // Try to parse as JSON if it looks like JSON
+          if (typeof v === 'string' && (v.startsWith('{') || v.startsWith('['))) {
+            parsed[k] = JSON.parse(v)
+          } else {
+            parsed[k] = v
+          }
+        } catch {
+          // If parsing fails, use original value
+          parsed[k] = v
+        }
+      }
+      return parsed as T
     }
   }
 

@@ -4,7 +4,24 @@
 'use client'
 
 import { FC, memo } from 'react'
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
+import { PrismLight as SyntaxHighlighter } from 'react-syntax-highlighter'
+// Import only commonly-used languages for better performance
+import bash from 'react-syntax-highlighter/dist/cjs/languages/prism/bash'
+import c from 'react-syntax-highlighter/dist/cjs/languages/prism/c'
+import cpp from 'react-syntax-highlighter/dist/cjs/languages/prism/cpp'
+import css from 'react-syntax-highlighter/dist/cjs/languages/prism/css'
+import go from 'react-syntax-highlighter/dist/cjs/languages/prism/go'
+import java from 'react-syntax-highlighter/dist/cjs/languages/prism/java'
+import javascript from 'react-syntax-highlighter/dist/cjs/languages/prism/javascript'
+import json from 'react-syntax-highlighter/dist/cjs/languages/prism/json'
+import jsx from 'react-syntax-highlighter/dist/cjs/languages/prism/jsx'
+import markdown from 'react-syntax-highlighter/dist/cjs/languages/prism/markdown'
+import php from 'react-syntax-highlighter/dist/cjs/languages/prism/php'
+import python from 'react-syntax-highlighter/dist/cjs/languages/prism/python'
+import rust from 'react-syntax-highlighter/dist/cjs/languages/prism/rust'
+import sql from 'react-syntax-highlighter/dist/cjs/languages/prism/sql'
+import tsx from 'react-syntax-highlighter/dist/cjs/languages/prism/tsx'
+import typescript from 'react-syntax-highlighter/dist/cjs/languages/prism/typescript'
 import { coldarkDark } from 'react-syntax-highlighter/dist/cjs/styles/prism'
 
 import { generateId } from 'ai'
@@ -13,6 +30,32 @@ import { Check, Copy, Download } from 'lucide-react'
 import { useCopyToClipboard } from '@/lib/hooks/use-copy-to-clipboard'
 
 import { Button } from '@/components/ui/button'
+
+// Register only the languages we need
+SyntaxHighlighter.registerLanguage('javascript', javascript)
+SyntaxHighlighter.registerLanguage('js', javascript)
+SyntaxHighlighter.registerLanguage('typescript', typescript)
+SyntaxHighlighter.registerLanguage('ts', typescript)
+SyntaxHighlighter.registerLanguage('python', python)
+SyntaxHighlighter.registerLanguage('py', python)
+SyntaxHighlighter.registerLanguage('java', java)
+SyntaxHighlighter.registerLanguage('bash', bash)
+SyntaxHighlighter.registerLanguage('shell', bash)
+SyntaxHighlighter.registerLanguage('sh', bash)
+SyntaxHighlighter.registerLanguage('json', json)
+SyntaxHighlighter.registerLanguage('markdown', markdown)
+SyntaxHighlighter.registerLanguage('md', markdown)
+SyntaxHighlighter.registerLanguage('jsx', jsx)
+SyntaxHighlighter.registerLanguage('tsx', tsx)
+SyntaxHighlighter.registerLanguage('css', css)
+SyntaxHighlighter.registerLanguage('sql', sql)
+SyntaxHighlighter.registerLanguage('go', go)
+SyntaxHighlighter.registerLanguage('rust', rust)
+SyntaxHighlighter.registerLanguage('rs', rust)
+SyntaxHighlighter.registerLanguage('php', php)
+SyntaxHighlighter.registerLanguage('c', c)
+SyntaxHighlighter.registerLanguage('cpp', cpp)
+SyntaxHighlighter.registerLanguage('c++', cpp)
 
 interface Props {
   language: string

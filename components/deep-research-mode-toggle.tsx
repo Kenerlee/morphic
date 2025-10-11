@@ -18,12 +18,14 @@ export function DeepResearchModeToggle() {
       pressed={isActive}
       onPressedChange={toggleMode}
       variant="outline"
+      disabled={true}
       className={cn(
         'gap-1 px-3 border border-input text-muted-foreground bg-background',
         'data-[state=on]:bg-accent-blue',
         'data-[state=on]:text-accent-blue-foreground',
         'data-[state=on]:border-accent-blue-border',
-        'hover:bg-accent hover:text-accent-foreground rounded-full'
+        'hover:bg-accent hover:text-accent-foreground rounded-full',
+        'opacity-50 cursor-not-allowed'
       )}
     >
       <Search className="size-4" />
