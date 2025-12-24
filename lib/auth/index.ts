@@ -3,8 +3,9 @@ import { admin } from 'better-auth/plugins/admin'
 import { phoneNumber } from 'better-auth/plugins/phone-number'
 import { invite } from 'better-auth-invite'
 
-import { sendAliyunSMS, generateOTP } from '@/lib/sms/aliyun'
 import { sendPasswordResetEmail } from '@/lib/email/smtp'
+import { generateOTP,sendAliyunSMS } from '@/lib/sms/aliyun'
+
 import { redisStorage } from './redis'
 
 // 创建 Better Auth 实例

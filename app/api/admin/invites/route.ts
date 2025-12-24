@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-import { getRedisClient } from '@/lib/redis/config'
 import { checkAdminAuth } from '@/lib/middleware/admin-auth'
+import { getRedisClient } from '@/lib/redis/config'
 
 // Redis keys
 const INVITES_KEY = 'invites:all'

@@ -1,7 +1,7 @@
 'use client'
 
 import { createAuthClient } from 'better-auth/client'
-import { phoneNumberClient, adminClient } from 'better-auth/client/plugins'
+import { adminClient,phoneNumberClient } from 'better-auth/client/plugins'
 import { inviteClient } from 'better-auth-invite'
 
 export const authClient = createAuthClient({

@@ -5,8 +5,6 @@ import {
   getOrCreateUserProfile,
   getUserProfileWithQuotaStatus} from '@/lib/actions/user-profile'
 import { getCurrentUser } from '@/lib/auth/get-current-user'
-import enMessages from '@/messages/en.json'
-import zhMessages from '@/messages/zh.json'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
@@ -14,6 +12,9 @@ import { InviteSection } from '@/components/profile/invite-section'
 import { LevelBadge } from '@/components/profile/level-badge'
 import { QuotaDashboard } from '@/components/profile/quota-dashboard'
 import { UpgradeCta } from '@/components/profile/upgrade-cta'
+
+import enMessages from '@/messages/en.json'
+import zhMessages from '@/messages/zh.json'
 
 export default async function ProfilePage() {
   const cookieStore = await cookies()
