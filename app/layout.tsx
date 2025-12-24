@@ -2,8 +2,8 @@ import type { Metadata, Viewport } from 'next'
 import { Inter as FontSans } from 'next/font/google'
 import { cookies } from 'next/headers'
 
+import { getCurrentUser } from '@/lib/auth/get-current-user'
 import { I18nProvider } from '@/lib/i18n/provider'
-import { createClient } from '@/lib/supabase/server'
 import { cn } from '@/lib/utils'
 
 import { SidebarProvider } from '@/components/ui/sidebar'
@@ -23,7 +23,7 @@ const fontSans = FontSans({
   variable: '--font-sans'
 })
 
-const title = '出海罗盘'
+const title = '摸摸底'
 const description =
   'AI驱动的出海市场研究与分析平台，为中国企业全球化扩张提供智能决策支持。'
 
@@ -55,17 +55,8 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
-  let user = null
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-
-  if (supabaseUrl && supabaseAnonKey) {
-    const supabase = await createClient()
-    const {
-      data: { user: supabaseUser }
-    } = await supabase.auth.getUser()
-    user = supabaseUser
-  }
+  // Get current user from Better Auth
+  const user = await getCurrentUser()
 
   // Get locale from cookie, default to 'zh' (Chinese)
   const cookieStore = await cookies()

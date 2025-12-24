@@ -1,9 +1,9 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 
-import { createClient } from '@/lib/supabase/client'
+import { authClient } from '@/lib/auth/client'
 import { cn } from '@/lib/utils/index'
 
 import { Button } from '@/components/ui/button'
@@ -25,16 +25,25 @@ export function UpdatePasswordForm({
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
+  const searchParams = useSearchParams()
 
-  const handleForgotPassword = async (e: React.FormEvent) => {
+  const handleUpdatePassword = async (e: React.FormEvent) => {
     e.preventDefault()
-    const supabase = createClient()
     setIsLoading(true)
     setError(null)
 
     try {
-      const { error } = await supabase.auth.updateUser({ password })
-      if (error) throw error
+      // Get token from URL (sent by Better Auth in the password reset email)
+      const token = searchParams.get('token')
+      if (!token) {
+        throw new Error('密码重置链接无效')
+      }
+
+      const { error } = await authClient.resetPassword({
+        newPassword: password,
+        token
+      })
+      if (error) throw new Error(error.message || '密码更新失败')
       // Redirect to root and refresh to ensure server components get updated session.
       router.push('/')
       router.refresh()
@@ -55,7 +64,7 @@ export function UpdatePasswordForm({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleForgotPassword}>
+          <form onSubmit={handleUpdatePassword}>
             <div className="flex flex-col gap-6">
               <div className="grid gap-2">
                 <Label htmlFor="password">New password</Label>

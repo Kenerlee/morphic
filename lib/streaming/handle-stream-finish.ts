@@ -2,6 +2,7 @@ import { CoreMessage, DataStreamWriter, JSONValue, Message } from 'ai'
 
 import { getChat, saveChat } from '@/lib/actions/chat'
 import { generateRelatedQuestions } from '@/lib/agents/generate-related-questions'
+import { deductQuota } from '@/lib/middleware/quota'
 import { ExtendedCoreMessage } from '@/lib/types'
 import { convertToExtendedCoreMessages } from '@/lib/utils'
 
@@ -27,6 +28,11 @@ export async function handleStreamFinish({
   annotations = []
 }: HandleStreamFinishParams) {
   try {
+    // 扣减配额（流成功完成后扣减）
+    if (userId) {
+      await deductQuota(userId)
+    }
+
     const extendedCoreMessages = convertToExtendedCoreMessages(originalMessages)
     let allAnnotations = [...annotations]
 

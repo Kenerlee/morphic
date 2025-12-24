@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 
 import { getCookie, setCookie } from '@/lib/utils/cookies'
 
-export type ResearchMode = 'search' | 'due-diligence' | 'deep-research' | null
+export type ResearchMode = 'search' | 'due-diligence' | 'deep-research' | 'homestay' | null
 
 /**
  * Hook to manage research mode selection with mutual exclusion
@@ -25,7 +25,8 @@ export function useResearchMode(mode: Exclude<ResearchMode, null>) {
       const modes: Exclude<ResearchMode, null>[] = [
         'search',
         'due-diligence',
-        'deep-research'
+        'deep-research',
+        'homestay'
       ]
 
       modes.forEach(m => {

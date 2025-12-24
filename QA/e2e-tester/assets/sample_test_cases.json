@@ -1,0 +1,25 @@
+[
+  {
+    "name": "Page Load Test",
+    "type": "load",
+    "description": "Verify the page loads successfully"
+  },
+  {
+    "name": "Hero Section Visible",
+    "type": "visible",
+    "selector": ".hero, #hero, [data-section='hero']",
+    "description": "Check main hero section is displayed"
+  },
+  {
+    "name": "Navigation Menu",
+    "type": "visible",
+    "selector": "nav, .navigation, #nav",
+    "description": "Verify navigation is present"
+  },
+  {
+    "name": "Footer Links",
+    "type": "visible", 
+    "selector": "footer, .footer",
+    "description": "Check footer section exists"
+  }
+]

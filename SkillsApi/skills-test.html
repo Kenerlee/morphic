@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Claude Skills API Tester</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 1200px; margin: 0 auto; padding: 20px; background: #f5f5f5; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 10px; margin-bottom: 20px; }
+        .section { background: white; padding: 20px; margin-bottom: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        h2 { color: #667eea; margin-top: 0; }
+        input, textarea, select { width: 100%; padding: 10px; margin: 5px 0; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+        button { background: #667eea; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; margin: 5px 5px 5px 0; }
+        button:hover { background: #5568d3; }
+        .response { background: #f8f9fa; padding: 15px; border-radius: 4px; margin-top: 10px; max-height: 400px; overflow-y: auto; display: none; }
+        pre { white-space: pre-wrap; word-wrap: break-word; }
+        .tabs { display: flex; border-bottom: 2px solid #ddd; margin-bottom: 20px; }
+        .tab { padding: 10px 20px; cursor: pointer; border: none; background: none; }
+        .tab.active { border-bottom: 2px solid #667eea; color: #667eea; font-weight: bold; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .skill-card { border-left: 4px solid #667eea; padding: 10px; margin: 10px 0; background: #f8f9fa; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Claude Skills API Tester</h1>
+        <p>Test and manage Claude Agent Skills</p>
+    </div>
+
+    <div class="section">
+        <h2>API Configuration</h2>
+        <label>API Key:</label>
+        <input type="password" id="apiKey" placeholder="sk-ant-api03-...">
+    </div>
+
+    <div class="section">
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('list')">List Skills</button>
+            <button class="tab" onclick="switchTab('create')">Create Skill</button>
+            <button class="tab" onclick="switchTab('use')">Use Skill</button>
+            <button class="tab" onclick="switchTab('manage')">Manage</button>
+        </div>
+
+        <div id="list" class="tab-content active">
+            <h2>List Skills</h2>
+            <label>Filter by source:</label>
+            <select id="source">
+                <option value="">All</option>
+                <option value="anthropic">Anthropic</option>
+                <option value="custom">Custom</option>
+            </select>
+            <button onclick="listSkills()">Get Skills</button>
+            <div id="listResult" class="response"></div>
+        </div>
+
+        <div id="create" class="tab-content">
+            <h2>Create Custom Skill</h2>
+            <label>Title:</label>
+            <input type="text" id="title" placeholder="My Skill">
+            <label>SKILL.md Content:</label>
+            <textarea id="content" rows="10" placeholder="---
+name: my-skill
+description: My custom skill
+---
+
+# My Skill
+Description..."></textarea>
+            <button onclick="createSkill()">Create</button>
+            <div id="createResult" class="response"></div>
+        </div>
+
+        <div id="use" class="tab-content">
+            <h2>Use Skill</h2>
+            <label>Skill ID:</label>
+            <input type="text" id="skillId" placeholder="xlsx or skill_01...">
+            <label>Type:</label>
+            <select id="type">
+                <option value="anthropic">Anthropic</option>
+                <option value="custom">Custom</option>
+            </select>
+            <label>Prompt:</label>
+            <textarea id="prompt" rows="4" placeholder="Create an Excel file with sales data"></textarea>
+            <button onclick="useSkill()">Execute</button>
+            <div id="useResult" class="response"></div>
+        </div>
+
+        <div id="manage" class="tab-content">
+            <h2>Manage Skill</h2>
+            <label>Skill ID:</label>
+            <input type="text" id="manageId" placeholder="skill_01...">
+            <button onclick="getDetails()">Get Details</button>
+            <button onclick="getVersions()">List Versions</button>
+            <button onclick="deleteSkill()" style="background:#dc3545;">Delete</button>
+            <div id="manageResult" class="response"></div>
+        </div>
+    </div>
+
+    <script>
+        const API = "https://api.anthropic.com/v1";
+        const VER = "2023-06-01";
+        const BETA = "skills-2025-10-02,code-execution-2025-08-25,files-api-2025-04-14";
+
+        function switchTab(name) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            event.target.classList.add('active');
+            document.getElementById(name).classList.add('active');
+        }
+
+        function getKey() {
+            const key = document.getElementById('apiKey').value.trim();
+            if (!key) { alert('Please enter API key'); throw new Error('No key'); }
+            return key;
+        }
+
+        async function request(path, opt = {}) {
+            const res = await fetch(API + path, {
+                ...opt,
+                headers: {
+                    'x-api-key': getKey(),
+                    'anthropic-version': VER,
+                    'anthropic-beta': BETA,
+                    ...opt.headers
+                }
+            });
+            if (!res.ok) throw new Error('API Error: ' + res.status + ' - ' + await res.text());
+            return res.json();
+        }
+
+        function show(id, data, err = false) {
+            const el = document.getElementById(id);
+            el.style.display = 'block';
+            el.innerHTML = '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
+        }
+
+        async function listSkills() {
+            try {
+                const src = document.getElementById('source').value;
+                const data = await request('/skills' + (src ? '?source=' + src : ''));
+                const html = data.data.map(s => 
+                    `<div class="skill-card"><strong>${s.display_title || s.name}</strong><br>` +
+                    `ID: ${s.id}<br>Source: ${s.source}<br>Version: ${s.latest_version}</div>`
+                ).join('');
+                document.getElementById('listResult').innerHTML = `<p>Found ${data.data.length} skills</p>` + html;
+                document.getElementById('listResult').style.display = 'block';
+            } catch (e) {
+                show('listResult', {error: e.message}, true);
+            }
+        }
+
+        async function createSkill() {
+            try {
+                const title = document.getElementById('title').value.trim();
+                const content = document.getElementById('content').value.trim();
+                if (!title || !content) throw new Error('Please fill title and content');
+
+                const form = new FormData();
+                form.append('display_title', title);
+                form.append('files[]', new Blob([content], {type: 'text/markdown'}), 'SKILL.md');
+
+                const res = await fetch(API + '/skills', {
+                    method: 'POST',
+                    headers: {
+                        'x-api-key': getKey(),
+                        'anthropic-version': VER,
+                        'anthropic-beta': BETA
+                    },
+                    body: form
+                });
+                if (!res.ok) throw new Error('Failed: ' + await res.text());
+                show('createResult', await res.json());
+            } catch (e) {
+                show('createResult', {error: e.message}, true);
+            }
+        }
+
+        async function useSkill() {
+            try {
+                const id = document.getElementById('skillId').value.trim();
+                const type = document.getElementById('type').value;
+                const prompt = document.getElementById('prompt').value.trim();
+                if (!id || !prompt) throw new Error('Please fill skill ID and prompt');
+
+                const data = await request('/messages', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        model: 'claude-sonnet-4-5-20250929',
+                        max_tokens: 4096,
+                        container: {
+                            skills: [{type: type, skill_id: id, version: 'latest'}]
+                        },
+                        messages: [{role: 'user', content: prompt}],
+                        tools: [{type: 'code_execution_20250825', name: 'code_execution'}]
+                    })
+                });
+                show('useResult', data);
+            } catch (e) {
+                show('useResult', {error: e.message}, true);
+            }
+        }
+
+        async function getDetails() {
+            try {
+                const id = document.getElementById('manageId').value.trim();
+                if (!id) throw new Error('Enter skill ID');
+                show('manageResult', await request('/skills/' + id));
+            } catch (e) {
+                show('manageResult', {error: e.message}, true);
+            }
+        }
+
+        async function getVersions() {
+            try {
+                const id = document.getElementById('manageId').value.trim();
+                if (!id) throw new Error('Enter skill ID');
+                show('manageResult', await request('/skills/' + id + '/versions'));
+            } catch (e) {
+                show('manageResult', {error: e.message}, true);
+            }
+        }
+
+        async function deleteSkill() {
+            try {
+                const id = document.getElementById('manageId').value.trim();
+                if (!id) throw new Error('Enter skill ID');
+                if (!confirm('Delete skill ' + id + '?')) return;
+
+                const vers = await request('/skills/' + id + '/versions');
+                for (let v of vers.data) {
+                    await request('/skills/' + id + '/versions/' + v.version, {method: 'DELETE'});
+                }
+                await request('/skills/' + id, {method: 'DELETE'});
+                show('manageResult', {message: 'Deleted', versions: vers.data.length});
+            } catch (e) {
+                show('manageResult', {error: e.message}, true);
+            }
+        }
+    </script>
+</body>
+</html>

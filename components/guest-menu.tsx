@@ -4,7 +4,6 @@ import Link from 'next/link'
 
 import {
   Languages,
-  Link2,
   LogIn,
   Palette,
   Settings2 // Or EllipsisVertical, etc.
@@ -24,7 +23,6 @@ import {
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
 
-import { ExternalLinkItems } from './external-link-items'
 import { LanguageMenuItems } from './language-menu-items'
 import { ThemeMenuItems } from './theme-menu-items'
 
@@ -62,15 +60,6 @@ export default function GuestMenu() {
           </DropdownMenuSubTrigger>
           <DropdownMenuSubContent>
             <LanguageMenuItems />
-          </DropdownMenuSubContent>
-        </DropdownMenuSub>
-        <DropdownMenuSub>
-          <DropdownMenuSubTrigger>
-            <Link2 className="mr-2 h-4 w-4" />
-            <span>{t('userMenu.links')}</span>
-          </DropdownMenuSubTrigger>
-          <DropdownMenuSubContent>
-            <ExternalLinkItems />
           </DropdownMenuSubContent>
         </DropdownMenuSub>
       </DropdownMenuContent>

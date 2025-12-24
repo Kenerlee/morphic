@@ -5,6 +5,11 @@ import { ChatRequestOptions, JSONValue, Message, ToolInvocation } from 'ai'
 import { AnswerSection } from './answer-section'
 import { ReasoningSection } from './reasoning-section'
 import RelatedQuestions from './related-questions'
+import {
+  SkillCompleteData,
+  SkillStepData,
+  SkillStepSection
+} from './skill-step-section'
 import { ToolSection } from './tool-section'
 import { UserMessage } from './user-message'
 
@@ -99,6 +104,43 @@ export function RenderMessage({
     return 0
   }, [reasoningAnnotation])
 
+  // Skill files data structure
+  interface SkillFilesData {
+    fileIds: string[]
+    downloadBaseUrl: string
+  }
+
+  // Extract skill step annotations and skill files
+  const { skillSteps, skillComplete, skillFiles } = useMemo(() => {
+    const annotations = message.annotations as any[] | undefined
+    if (!annotations) return { skillSteps: [], skillComplete: null, skillFiles: null }
+
+    const steps: SkillStepData[] = []
+    let complete: SkillCompleteData | null = null
+    let files: SkillFilesData | null = null
+
+    // Use a map to track steps by stepId and update their state
+    const stepMap = new Map<string, SkillStepData>()
+
+    for (const annotation of annotations) {
+      if (annotation?.type === 'skill_step' && annotation?.data) {
+        const data = annotation.data as SkillStepData
+        // Update or add step (later annotations override earlier ones)
+        stepMap.set(data.stepId, data)
+      } else if (annotation?.type === 'skill_complete' && annotation?.data) {
+        complete = annotation.data as SkillCompleteData
+      } else if (annotation?.type === 'skill_files' && annotation?.data) {
+        files = annotation.data as SkillFilesData
+      }
+    }
+
+    // Convert map to array and sort by step number
+    steps.push(...Array.from(stepMap.values()))
+    steps.sort((a, b) => a.stepNumber - b.stepNumber)
+
+    return { skillSteps: steps, skillComplete: complete, skillFiles: files }
+  }, [message.annotations])
+
   if (message.role === 'user') {
     return (
       <UserMessage
@@ -112,6 +154,18 @@ export function RenderMessage({
   // New way: Use parts instead of toolInvocations
   return (
     <>
+      {/* Render skill steps if present */}
+      {skillSteps.length > 0 && (
+        <SkillStepSection
+          steps={skillSteps}
+          isComplete={skillComplete !== null}
+          completedInfo={skillComplete || undefined}
+          isOpen={getIsOpen(`${messageId}-skill-steps`)}
+          onOpenChange={open => onOpenChange(`${messageId}-skill-steps`, open)}
+          fileIds={skillFiles?.fileIds}
+          downloadBaseUrl={skillFiles?.downloadBaseUrl}
+        />
+      )}
       {toolData.map(tool => (
         <ToolSection
           key={tool.toolCallId}

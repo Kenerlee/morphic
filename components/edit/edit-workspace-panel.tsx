@@ -178,7 +178,7 @@ export function EditWorkspacePanel() {
           content={state.editedContent}
           onChange={updateContent}
           className="h-full border-0"
-          showOutline={true}
+          showOutline={false}
         />
       </div>
     </div>

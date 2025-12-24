@@ -34,13 +34,14 @@ export function ReportCard({ report, onDelete }: ReportCardProps) {
   const [isDeleting, setIsDeleting] = useState(false)
 
   // Generate consistent random height based on report ID
-  const getCardHeight = (id: string) => {
+  const getCardHeight = (id: string | undefined) => {
     const heights = ['h-48', 'h-56', 'h-64', 'h-52', 'h-60', 'h-44']
+    if (!id) return heights[0]
     const hash = id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0)
     return heights[hash % heights.length]
   }
 
-  const imageHeight = getCardHeight(report.id)
+  const imageHeight = getCardHeight(report?.id)
 
   const handleDelete = async () => {
     if (!confirm('确定要删除这份报告吗？此操作无法撤销。')) {

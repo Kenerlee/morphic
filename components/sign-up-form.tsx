@@ -1,9 +1,9 @@
 'use client'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 
-import { createClient } from '@/lib/supabase/client'
+import { authClient } from '@/lib/auth/client'
 import { cn } from '@/lib/utils/index'
 
 import { Button } from '@/components/ui/button'
@@ -21,9 +21,10 @@ import { PasswordInput } from '@/components/ui/password-input'
 
 interface SignUpFormProps extends React.ComponentPropsWithoutRef<'div'> {
   messages: any
+  initialInviteCode?: string
 }
 
-export function SignUpForm({ className, messages, ...props }: SignUpFormProps) {
+export function SignUpForm({ className, messages, initialInviteCode = '', ...props }: SignUpFormProps) {
   const t = (key: string) => {
     const keys = key.split('.')
     let value: any = messages
@@ -35,13 +36,41 @@ export function SignUpForm({ className, messages, ...props }: SignUpFormProps) {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [repeatPassword, setRepeatPassword] = useState('')
+  const [inviteCode, setInviteCode] = useState(initialInviteCode.toUpperCase())
+  const [inviteStatus, setInviteStatus] = useState<'idle' | 'valid' | 'invalid'>('idle')
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
 
+  // 验证邀请码
+  const validateInviteCode = async (code: string) => {
+    if (!code || code.length < 6) {
+      setInviteStatus('idle')
+      return
+    }
+
+    try {
+      const response = await fetch('/api/auth/invite/validate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code: code.toUpperCase() })
+      })
+      const data = await response.json()
+      setInviteStatus(data.valid ? 'valid' : 'invalid')
+    } catch {
+      setInviteStatus('invalid')
+    }
+  }
+
+  // Validate initial invite code if provided via URL
+  useEffect(() => {
+    if (initialInviteCode && initialInviteCode.length >= 6) {
+      validateInviteCode(initialInviteCode)
+    }
+  }, [initialInviteCode])
+
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault()
-    const supabase = createClient()
     setIsLoading(true)
     setError(null)
 
@@ -52,17 +81,36 @@ export function SignUpForm({ className, messages, ...props }: SignUpFormProps) {
     }
 
     try {
-      const { error } = await supabase.auth.signUp({
+      // 使用 Better Auth 注册
+      const { data, error } = await authClient.signUp.email({
         email,
         password,
-        options: {
-          emailRedirectTo: `${window.location.origin}/`
-        }
+        name: email.split('@')[0], // 使用邮箱前缀作为默认名称
       })
-      if (error) throw error
-      router.push('/auth/sign-up-success')
+
+      if (error) {
+        throw new Error(error.message || '注册失败')
+      }
+
+      // 如果有有效的邀请码，激活它（升级用户角色）
+      if (inviteCode && inviteStatus === 'valid') {
+        try {
+          await fetch('/api/auth/invite/activate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ code: inviteCode })
+          })
+        } catch (err) {
+          console.error('Failed to activate invite:', err)
+          // 不阻止注册流程
+        }
+      }
+
+      // 注册成功后直接登录（Better Auth 默认会自动登录）
+      router.push('/')
+      router.refresh()
     } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : 'An error occurred')
+      setError(error instanceof Error ? error.message : '注册失败')
     } finally {
       setIsLoading(false)
     }
@@ -123,10 +171,62 @@ export function SignUpForm({ className, messages, ...props }: SignUpFormProps) {
                   onChange={e => setRepeatPassword(e.target.value)}
                 />
               </div>
+
+              {/* 邀请码输入 */}
+              <div className="grid gap-2">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="invite-code">{t('auth.inviteCode')}</Label>
+                  <span className="text-xs text-muted-foreground">{t('auth.optional')}</span>
+                </div>
+                <div className="relative">
+                  <Input
+                    id="invite-code"
+                    type="text"
+                    placeholder={t('placeholders.inviteCodePlaceholder')}
+                    value={inviteCode}
+                    onChange={e => {
+                      const code = e.target.value.toUpperCase()
+                      setInviteCode(code)
+                      if (code.length >= 6) {
+                        validateInviteCode(code)
+                      } else {
+                        setInviteStatus('idle')
+                      }
+                    }}
+                    maxLength={8}
+                    className={cn(
+                      'font-mono tracking-wider',
+                      inviteStatus === 'valid' && 'border-green-500 focus-visible:ring-green-500',
+                      inviteStatus === 'invalid' && 'border-red-500 focus-visible:ring-red-500'
+                    )}
+                  />
+                  {inviteStatus === 'valid' && (
+                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-green-500 text-sm">
+                      ✓ {t('auth.inviteCodeValid')}
+                    </span>
+                  )}
+                  {inviteStatus === 'invalid' && (
+                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-red-500 text-sm">
+                      ✗ {t('auth.inviteCodeInvalid')}
+                    </span>
+                  )}
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  {t('auth.inviteCodeHint')}
+                </p>
+              </div>
+
               {error && <p className="text-sm text-red-500">{error}</p>}
               <Button type="submit" className="w-full" disabled={isLoading}>
                 {isLoading ? t('auth.creatingAccount') : t('auth.signUp')}
               </Button>
+
+              <Link
+                href={inviteCode ? `/auth/sign-up?invite=${inviteCode}` : '/auth/sign-up'}
+                className="text-center text-sm text-muted-foreground hover:underline"
+              >
+                {t('auth.usePhoneSignUp')}
+              </Link>
             </div>
             <div className="mt-6 text-center text-sm">
               {t('auth.alreadyHaveAccount')}{' '}

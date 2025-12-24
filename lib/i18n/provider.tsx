@@ -50,11 +50,19 @@ export function I18nProvider({
   )
 }
 
-export function useTranslations() {
+export function useTranslations(namespace?: string) {
   const context = useContext(I18nContext)
   if (!context) {
     throw new Error('useTranslations must be used within I18nProvider')
   }
+
+  // If namespace is provided, return a function that prepends the namespace
+  if (namespace) {
+    return (key: string, params?: Record<string, any>) => {
+      return context.t(`${namespace}.${key}`, params)
+    }
+  }
+
   return context.t
 }
 

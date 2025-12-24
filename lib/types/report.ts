@@ -4,6 +4,7 @@ export interface Report {
   title: string
   content: string // HTML format from rich text editor
   coverImage?: string
+  isPublic?: boolean // 是否公开到 Discovery 频道
   metadata: ReportMetadata
   createdAt: Date
   updatedAt: Date
@@ -29,6 +30,7 @@ export interface UpdateReportInput {
   title?: string
   content?: string
   coverImage?: string
+  isPublic?: boolean
   metadata?: Partial<ReportMetadata>
 }
 

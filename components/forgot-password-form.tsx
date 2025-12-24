@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 
-import { createClient } from '@/lib/supabase/client'
+import { authClient } from '@/lib/auth/client'
 import { cn } from '@/lib/utils/index'
 
 import { Button } from '@/components/ui/button'
@@ -41,16 +41,23 @@ export function ForgotPasswordForm({
 
   const handleForgotPassword = async (e: React.FormEvent) => {
     e.preventDefault()
-    const supabase = createClient()
     setIsLoading(true)
     setError(null)
 
     try {
-      // The url which will be included in the email. This URL needs to be configured in your redirect URLs in the Supabase dashboard at https://supabase.com/dashboard/project/_/auth/url-configuration
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/auth/update-password`
+      // Use Better Auth to send password reset email
+      // Note: This requires sendResetPassword to be configured in lib/auth/index.ts
+      const response = await authClient.$fetch<{ status: boolean; message?: string }>('/request-password-reset', {
+        method: 'POST',
+        body: {
+          email,
+          redirectTo: `${window.location.origin}/auth/update-password`
+        }
       })
-      if (error) throw error
+
+      if (response.error) {
+        throw new Error(response.error.message || '发送失败')
+      }
       setSuccess(true)
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : 'An error occurred')

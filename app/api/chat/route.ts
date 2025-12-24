@@ -1,12 +1,14 @@
 import { cookies } from 'next/headers'
 
 import { getCurrentUserId } from '@/lib/auth/get-current-user'
+import { checkQuota } from '@/lib/middleware/quota'
+import { createHomestayStreamResponse } from '@/lib/streaming/create-homestay-stream'
 import { createManualToolStreamResponse } from '@/lib/streaming/create-manual-tool-stream'
 import { createToolCallingStreamResponse } from '@/lib/streaming/create-tool-calling-stream'
 import { Model } from '@/lib/types/models'
 import { isProviderEnabled } from '@/lib/utils/registry'
 
-export const maxDuration = 30
+export const maxDuration = 600 // 10 minutes for skill API calls (complex reports can take 7-8 mins)
 
 const DEFAULT_MODEL: Model = {
   id: 'deepseek-chat',
@@ -31,6 +33,23 @@ export async function POST(req: Request) {
       })
     }
 
+    // 配额检查（仅对已登录用户）
+    if (userId) {
+      const quotaResult = await checkQuota(userId)
+      if (!quotaResult.allowed && quotaResult.error) {
+        return new Response(
+          JSON.stringify({
+            error: quotaResult.error.message,
+            error_code: quotaResult.error.code
+          }),
+          {
+            status: 403,
+            headers: { 'Content-Type': 'application/json' }
+          }
+        )
+      }
+    }
+
     const cookieStore = await cookies()
     const modelJson = cookieStore.get('selectedModel')?.value
     const searchMode = cookieStore.get('search-mode')?.value === 'true'
@@ -38,6 +57,7 @@ export async function POST(req: Request) {
       cookieStore.get('due-diligence-mode')?.value === 'true'
     const deepResearchMode =
       cookieStore.get('deep-research-mode')?.value === 'true'
+    const homestayMode = cookieStore.get('homestay-mode')?.value === 'true'
 
     let selectedModel = DEFAULT_MODEL
 
@@ -49,16 +69,16 @@ export async function POST(req: Request) {
       }
     }
 
-    // Auto-select Claude Sonnet 4+ for due diligence mode
-    if (dueDiligenceMode) {
+    // Auto-select Claude Sonnet 4+ for due diligence mode or homestay mode
+    if (dueDiligenceMode || homestayMode) {
       const isClaude4Plus =
-        selectedModel.id === 'claude-sonnet-4-5-20250929' ||
+        selectedModel.id === 'claude-sonnet-4-5' ||
         selectedModel.id === 'claude-sonnet-4-20250514'
 
       if (!isClaude4Plus) {
         // Override with Claude Sonnet 4.5 as the preferred model
         selectedModel = {
-          id: 'claude-sonnet-4-5-20250929',
+          id: 'claude-sonnet-4-5',
           name: 'Claude Sonnet 4.5',
           provider: 'Anthropic',
           providerId: 'anthropic',
@@ -66,7 +86,7 @@ export async function POST(req: Request) {
           toolCallType: 'native'
         }
         console.log(
-          'Auto-selected Claude Sonnet 4.5 for market due diligence mode'
+          `Auto-selected Claude Sonnet 4.5 for ${homestayMode ? 'homestay' : 'market due diligence'} mode`
         )
       }
     }
@@ -86,6 +106,20 @@ export async function POST(req: Request) {
 
     const supportsToolCalling = selectedModel.toolCallType === 'native'
 
+    // Use dedicated homestay stream for homestay mode (streams from Skills API)
+    if (homestayMode) {
+      return createHomestayStreamResponse({
+        messages,
+        model: selectedModel,
+        chatId,
+        searchMode,
+        dueDiligenceMode,
+        deepResearchMode,
+        homestayMode,
+        userId
+      })
+    }
+
     return supportsToolCalling
       ? createToolCallingStreamResponse({
           messages,
@@ -94,6 +128,7 @@ export async function POST(req: Request) {
           searchMode,
           dueDiligenceMode,
           deepResearchMode,
+          homestayMode,
           userId
         })
       : createManualToolStreamResponse({
@@ -103,6 +138,7 @@ export async function POST(req: Request) {
           searchMode,
           dueDiligenceMode,
           deepResearchMode,
+          homestayMode,
           userId
         })
   } catch (error) {

@@ -4,7 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 
-import { createClient } from '@/lib/supabase/client'
+import { authClient } from '@/lib/auth/client'
 import { cn } from '@/lib/utils/index'
 
 import { Button } from '@/components/ui/button'
@@ -41,16 +41,19 @@ export function LoginForm({ className, messages, ...props }: LoginFormProps) {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
-    const supabase = createClient()
     setIsLoading(true)
     setError(null)
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      // 使用 Better Auth 登录
+      const { data, error } = await authClient.signIn.email({
         email,
-        password
+        password,
       })
-      if (error) throw error
+
+      if (error) {
+        throw new Error(error.message || '登录失败')
+      }
 
       // Check if there's a return URL stored
       const returnUrl = sessionStorage.getItem('returnUrl')
@@ -63,29 +66,7 @@ export function LoginForm({ className, messages, ...props }: LoginFormProps) {
       }
       router.refresh()
     } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : 'An error occurred')
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
-  const handleSocialLogin = async () => {
-    const supabase = createClient()
-    setIsLoading(true)
-    setError(null)
-
-    try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: `${location.origin}/auth/oauth`
-        }
-      })
-      if (error) throw error
-    } catch (error: unknown) {
-      setError(
-        error instanceof Error ? error.message : 'An OAuth error occurred'
-      )
+      setError(error instanceof Error ? error.message : '登录失败')
     } finally {
       setIsLoading(false)
     }
@@ -106,6 +87,7 @@ export function LoginForm({ className, messages, ...props }: LoginFormProps) {
         </CardHeader>
         <CardContent>
           <div className="flex flex-col gap-4">
+            {/* Google login temporarily disabled
             <Button
               variant="outline"
               type="button"
@@ -124,6 +106,7 @@ export function LoginForm({ className, messages, ...props }: LoginFormProps) {
                 <span className="bg-muted px-2 text-muted-foreground">{t('auth.or')}</span>
               </div>
             </div>
+            */}
 
             <form onSubmit={handleLogin} className="flex flex-col gap-4">
               <div className="grid gap-2">
@@ -161,6 +144,13 @@ export function LoginForm({ className, messages, ...props }: LoginFormProps) {
                 {isLoading ? t('auth.loggingIn') : t('auth.signIn')}
               </Button>
             </form>
+
+            <Link
+              href="/auth/login"
+              className="text-center text-sm text-muted-foreground hover:underline"
+            >
+              {t('auth.usePhoneLogin')}
+            </Link>
           </div>
           <div className="mt-6 text-center text-sm">
             {t('auth.dontHaveAccount')}{' '}

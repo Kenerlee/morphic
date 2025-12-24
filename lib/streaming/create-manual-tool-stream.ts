@@ -24,8 +24,11 @@ export function createManualToolStreamResponse(config: BaseStreamConfig) {
         searchMode,
         dueDiligenceMode,
         deepResearchMode,
+        homestayMode,
         userId
       } = config
+      // Note: homestayMode is handled by tool-calling stream, not manual stream
+      void homestayMode
       const modelId = `${model.providerId}:${model.id}`
       let toolCallModelId = model.toolCallModel
         ? `${model.providerId}:${model.toolCallModel}`

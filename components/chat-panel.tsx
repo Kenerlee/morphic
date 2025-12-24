@@ -15,11 +15,9 @@ import { useArtifact } from './artifact/artifact-context'
 import { Button } from './ui/button'
 import { IconLogo } from './ui/icons'
 import { AuthPromptDialog } from './auth-prompt-dialog'
-import { DeepResearchModeToggle } from './deep-research-mode-toggle'
-import { DueDiligenceModeToggle } from './due-diligence-mode-toggle'
 import { EmptyScreen } from './empty-screen'
 import { ModelSelector } from './model-selector'
-import { SearchModeToggle } from './search-mode-toggle'
+import { ResearchModeSelector } from './research-mode-selector'
 
 interface ChatPanelProps {
   input: string
@@ -209,14 +207,12 @@ export function ChatPanel({
           />
 
           {/* Bottom menu area */}
-          <div className="flex items-center justify-between p-3">
-            <div className="flex items-center gap-2">
+          <div className="flex items-center justify-between gap-2 p-3">
+            <div className="flex items-center gap-2 min-w-0 overflow-x-auto scrollbar-hide">
               <ModelSelector models={models || []} />
-              <SearchModeToggle />
-              <DueDiligenceModeToggle />
-              <DeepResearchModeToggle />
+              <ResearchModeSelector />
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 shrink-0">
               {messages.length > 0 && (
                 <Button
                   variant="outline"

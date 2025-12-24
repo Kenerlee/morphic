@@ -1,9 +1,12 @@
 {
   "navigation": {
-    "appTitle": "出海罗盘",
+    "appTitle": "摸摸底",
     "startResearch": "开始调研",
     "myReports": "我的报告",
-    "history": "历史记录"
+    "history": "历史记录",
+    "discovery": "Discovery",
+    "expert": "专家调研",
+    "admin": "管理后台"
   },
   "buttons": {
     "save": "保存",
@@ -60,7 +63,34 @@
     "loginPromptTitle": "请登录后提问",
     "loginPromptMessage": "加入我们，开始您的研究之旅",
     "loginPromptDescription": "登录后您可以保存搜索历史、生成报告，并随时管理您的问题",
-    "continueAsGuest": "继续访问"
+    "continueAsGuest": "继续访问",
+    "phone": "手机号",
+    "phoneHint": "请输入中国大陆手机号，如 13800138000",
+    "sendCode": "发送验证码",
+    "sendingCode": "发送中...",
+    "verificationCode": "验证码",
+    "otpSentTo": "验证码已发送至",
+    "verify": "验证",
+    "verifying": "验证中...",
+    "verifyAndSignUp": "验证并注册",
+    "changePhone": "更换手机号",
+    "resendCode": "重新发送",
+    "resendIn": "{seconds}秒后重发",
+    "useEmailLogin": "使用邮箱登录",
+    "usePhoneLogin": "使用手机号登录",
+    "useEmailSignUp": "使用邮箱注册",
+    "usePhoneSignUp": "使用手机号注册",
+    "enterPhoneToGetStarted": "输入您的手机号开始注册",
+    "sendOtpError": "发送验证码失败，请重试",
+    "verifyOtpError": "验证码验证失败，请重试",
+    "phoneRequired": "请输入正确的手机号",
+    "otpRequired": "请输入6位短信验证码",
+    "sendCodeFirst": "请先获取短信验证码",
+    "inviteCode": "邀请码",
+    "optional": "选填",
+    "inviteCodeValid": "有效",
+    "inviteCodeInvalid": "无效",
+    "inviteCodeHint": "有邀请码？填写后可获得完整权限"
   },
   "userMenu": {
     "theme": "主题",
@@ -72,7 +102,10 @@
     "openMenu": "打开菜单",
     "language": "语言",
     "defaultUser": "用户",
-    "defaultInitial": "用"
+    "defaultInitial": "用",
+    "profile": "个人中心",
+    "admin": "管理后台",
+    "quotaRemaining": "剩余次数"
   },
   "guestMenu": {
     "signIn": "登录"
@@ -85,11 +118,27 @@
     "retry": "重试",
     "search": "联网搜索"
   },
+  "researchMode": {
+    "select": "选择模式",
+    "none": "普通对话"
+  },
   "research": {
     "research": "市场尽调",
     "deepResearch": "深度研究",
     "questionSkipped": "问题已跳过",
     "toggleDeepResearchMode": "切换深度研究模式"
+  },
+  "homestay": {
+    "homestayResearch": "民宿尽调",
+    "tooltip": "启用民宿投资尽调模式，获取数据驱动的投资分析",
+    "analysisResult": "民宿市场分析结果",
+    "analyzing": "正在分析民宿市场...",
+    "analysisComplete": "分析完成",
+    "analysisFailed": "分析失败",
+    "noData": "暂无数据",
+    "model": "模型",
+    "tokens": "Token用量",
+    "stopReason": "停止原因"
   },
   "questionConfirmation": {
     "selected": "已选择：",
@@ -229,7 +278,10 @@
   },
   "placeholders": {
     "emailPlaceholder": "you@example.com",
-    "passwordPlaceholder": "********"
+    "passwordPlaceholder": "********",
+    "phonePlaceholder": "13800138000",
+    "otpPlaceholder": "请输入6位验证码",
+    "inviteCodePlaceholder": "ABCD1234"
   },
   "accessibility": {
     "retryFromMessage": "从消息 {messageId} 重试",
@@ -253,5 +305,144 @@
     "industryPlaceholder": "例如：科技、制造业、消费品、金融等",
     "additionalRequirements": "其他具体需求",
     "additionalRequirementsPlaceholder": "请描述您的具体分析需求（可选）"
+  },
+  "quota": {
+    "remaining": "剩余配额",
+    "used": "已使用",
+    "limit": "配额上限",
+    "exhausted": "配额已用完",
+    "upgradePrompt": "升级获取更多配额",
+    "unlimited": "无限制",
+    "resetDate": "重置日期"
+  },
+  "level": {
+    "free": "免费版",
+    "pro": "专业版",
+    "vip": "VIP",
+    "admin": "管理员",
+    "expiresAt": "有效期至",
+    "permanent": "永久有效"
+  },
+  "admin": {
+    "title": "管理后台",
+    "dashboard": "控制面板",
+    "users": "用户管理",
+    "updateLevel": "修改等级",
+    "userList": "用户列表",
+    "totalUsers": "共 {count} 个用户",
+    "search": "搜索用户...",
+    "mobile": "手机号",
+    "level": "等级",
+    "quotaUsed": "配额使用",
+    "createdAt": "注册时间",
+    "actions": "操作",
+    "editLevel": "修改等级",
+    "selectLevel": "选择等级",
+    "expireDate": "有效期",
+    "noExpire": "永久有效",
+    "save": "保存",
+    "cancel": "取消",
+    "updateSuccess": "更新成功",
+    "updateFailed": "更新失败",
+    "noUsers": "暂无用户",
+    "loading": "加载中..."
+  },
+  "profile": {
+    "title": "个人中心",
+    "quotaDashboard": "配额使用情况",
+    "currentLevel": "当前等级",
+    "upgradeNow": "立即升级",
+    "contactUs": "联系我们",
+    "accountInfo": "账户信息",
+    "userId": "用户ID",
+    "phone": "手机号",
+    "notBound": "未绑定",
+    "invite": {
+      "title": "我的邀请码",
+      "description": "邀请好友注册，好友可获得正式用户权限。每个邀请码有效期 30 天。",
+      "invited": "已邀请 {count} 人",
+      "created": "已创建",
+      "used": "已使用",
+      "available": "可用",
+      "generate": "生成邀请码",
+      "generating": "创建中...",
+      "maxReached": "最多 10 个可用邀请码",
+      "createError": "创建邀请码失败",
+      "statusUsed": "已使用",
+      "statusExpired": "已过期",
+      "statusAvailable": "可用",
+      "expires": "过期",
+      "copy": "复制",
+      "copied": "已复制",
+      "shareLink": "分享链接",
+      "noInvites": "暂无邀请码",
+      "noInvitesHint": "点击上方按钮生成您的第一个邀请码"
+    }
+  },
+  "discovery": {
+    "title": "Discovery",
+    "subtitle": "发现优质的市场调研报告，获取行业洞察",
+    "publicReports": "公开报告",
+    "startResearch": "开始我的调研",
+    "noPublicReports": "暂无公开报告",
+    "noPublicReportsMessage": "成为第一个分享研究成果的人吧",
+    "makePublic": "公开报告",
+    "makePrivate": "取消公开",
+    "publicSwitch": "公开到 Discovery",
+    "viewReport": "查看报告",
+    "author": "作者",
+    "anonymous": "匿名用户"
+  },
+  "expert": {
+    "title": "专家调研",
+    "subtitle": "获取专业的出海调研服务",
+    "contactForm": "预约咨询",
+    "wechatScan": "微信扫码咨询",
+    "services": "我们的服务",
+    "service1Title": "市场进入策略",
+    "service1Desc": "制定符合目标市场特点的进入策略",
+    "service2Title": "本地化咨询",
+    "service2Desc": "产品、运营、营销的本地化方案",
+    "service3Title": "合规与法务",
+    "service3Desc": "目标市场的法规政策合规指导",
+    "name": "姓名",
+    "namePlaceholder": "请输入您的姓名",
+    "company": "公司名称",
+    "companyPlaceholder": "请输入公司名称",
+    "phone": "联系电话",
+    "phonePlaceholder": "请输入联系电话",
+    "email": "邮箱",
+    "emailPlaceholder": "请输入邮箱地址",
+    "consultationType": "咨询类型",
+    "selectType": "请选择咨询类型",
+    "typeMarket": "市场进入策略",
+    "typeLocalization": "本地化咨询",
+    "typeLegal": "合规与法务",
+    "typeOther": "其他",
+    "description": "咨询内容",
+    "descriptionPlaceholder": "请简要描述您的咨询需求",
+    "submit": "提交咨询",
+    "submitting": "提交中...",
+    "submitSuccess": "提交成功，我们会尽快与您联系",
+    "submitFailed": "提交失败，请重试",
+    "wechatTitle": "微信扫码",
+    "wechatDesc": "扫描二维码添加客服微信，获取即时咨询服务",
+    "wechatId": "微信号"
+  },
+  "captcha": {
+    "title": "图形验证",
+    "subtitle": "请计算图片中的结果",
+    "refresh": "点击刷新",
+    "error": "验证码错误，请重试",
+    "placeholder": "请输入计算结果",
+    "verifying": "验证中...",
+    "verify": "验证",
+    "required": "请输入图形验证码答案"
+  },
+  "errors": {
+    "quotaExceeded": "配额已用完，请升级获取更多使用次数",
+    "subscriptionExpired": "订阅已过期，请续费",
+    "forbidden": "无权限访问",
+    "unauthorized": "请先登录"
   }
 }

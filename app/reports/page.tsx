@@ -16,7 +16,7 @@ import {
   ReportsPageHeader} from '@/components/reports-page-client'
 
 export const metadata = {
-  title: '我的报告 - 出海罗盘',
+  title: '我的报告 - 摸摸底',
   description: '查看和管理您保存的出海市场研究报告'
 }
 
@@ -52,11 +52,13 @@ export default async function ReportsPage() {
             <EmptyReportsState />
           ) : (
             <div className="columns-1 sm:columns-2 md:columns-3 lg:columns-4 xl:columns-5 2xl:columns-6 gap-6 space-y-6">
-              {reports.map(report => (
-                <div key={report.id} className="mb-6 break-inside-avoid">
-                  <ReportCard report={report} />
-                </div>
-              ))}
+              {reports
+                .filter(report => report?.id)
+                .map(report => (
+                  <div key={report.id} className="mb-6 break-inside-avoid">
+                    <ReportCard report={report} />
+                  </div>
+                ))}
             </div>
           )}
         </div>

@@ -23,6 +23,10 @@ function getReportKey(reportId: string) {
   return `report:${REPORT_VERSION}:${reportId}`
 }
 
+function getPublicReportsKey() {
+  return `reports:${REPORT_VERSION}:public`
+}
+
 /**
  * Generate a unique report ID
  */
@@ -121,6 +125,7 @@ export async function createReport(
     title: input.title,
     content: input.content,
     coverImage: input.coverImage,
+    isPublic: false,
     metadata: {
       ...input.metadata,
       wordCount
@@ -139,6 +144,7 @@ export async function createReport(
     title: report.title,
     content: report.content,
     coverImage: report.coverImage || '',
+    isPublic: 'false',
     metadata: JSON.stringify(report.metadata),
     createdAt: report.createdAt.toISOString(),
     updatedAt: report.updatedAt.toISOString()
@@ -197,6 +203,8 @@ export async function getReports(userId: string): Promise<Report[]> {
         if (plainReport.updatedAt && !(plainReport.updatedAt instanceof Date)) {
           plainReport.updatedAt = new Date(plainReport.updatedAt)
         }
+        // Convert isPublic string to boolean
+        plainReport.isPublic = plainReport.isPublic === 'true'
         return plainReport as Report
       })
   } catch (error) {
@@ -240,10 +248,55 @@ export async function getReport(
     if (plainReport.updatedAt && !(plainReport.updatedAt instanceof Date)) {
       plainReport.updatedAt = new Date(plainReport.updatedAt as string)
     }
+    // Convert isPublic string to boolean
+    plainReport.isPublic = plainReport.isPublic === 'true'
 
     return plainReport as Report
   } catch (error) {
     console.error('Error getting report:', error)
+    return null
+  }
+}
+
+/**
+ * Get a public report by ID (no ownership check)
+ */
+export async function getPublicReport(
+  reportId: string
+): Promise<Report | null> {
+  try {
+    const redis = await getRedis()
+    const reportKey = getReportKey(reportId)
+    const report = await redis.hgetall(reportKey)
+
+    if (!report || Object.keys(report).length === 0) {
+      return null
+    }
+
+    // Check if report is public
+    if (report.isPublic !== 'true') {
+      return null
+    }
+
+    const plainReport: any = { ...report }
+    if (typeof plainReport.metadata === 'string') {
+      try {
+        plainReport.metadata = JSON.parse(plainReport.metadata)
+      } catch {
+        plainReport.metadata = {}
+      }
+    }
+    if (plainReport.createdAt && !(plainReport.createdAt instanceof Date)) {
+      plainReport.createdAt = new Date(plainReport.createdAt as string)
+    }
+    if (plainReport.updatedAt && !(plainReport.updatedAt instanceof Date)) {
+      plainReport.updatedAt = new Date(plainReport.updatedAt as string)
+    }
+    plainReport.isPublic = true
+
+    return plainReport as Report
+  } catch (error) {
+    console.error('Error getting public report:', error)
     return null
   }
 }
@@ -311,10 +364,28 @@ export async function updateReport(
       updates.metadata = JSON.stringify(metadata)
     }
 
+    // Handle isPublic field
+    if (input.isPublic !== undefined) {
+      updates.isPublic = input.isPublic ? 'true' : 'false'
+    }
+
     await redis.hmset(reportKey, updates)
+
+    // Update public reports index
+    if (input.isPublic !== undefined) {
+      const publicReportsKey = getPublicReportsKey()
+      if (input.isPublic) {
+        // Add to public reports index
+        await redis.zadd(publicReportsKey, Date.now(), reportKey)
+      } else {
+        // Remove from public reports index
+        await redis.zrem(publicReportsKey, reportKey)
+      }
+    }
 
     revalidatePath('/reports')
     revalidatePath(`/reports/${reportId}`)
+    revalidatePath('/discovery')
 
     return getReport(reportId, userId)
   } catch (error) {
@@ -346,17 +417,106 @@ export async function deleteReport(
     }
 
     const userReportsKey = getUserReportsKey(userId)
+    const publicReportsKey = getPublicReportsKey()
 
     // Remove from user's reports list
     await redis.zrem(userReportsKey, reportKey)
+
+    // Remove from public reports list if it was public
+    await redis.zrem(publicReportsKey, reportKey)
 
     // Delete report
     await redis.del(reportKey)
 
     revalidatePath('/reports')
+    revalidatePath('/discovery')
     return true
   } catch (error) {
     console.error('Error deleting report:', error)
     return false
   }
+}
+
+/**
+ * Get all public reports for Discovery page
+ */
+export async function getPublicReports(
+  page: number = 1,
+  limit: number = 12
+): Promise<{ reports: Report[]; total: number; hasMore: boolean }> {
+  try {
+    const redis = await getRedis()
+    const publicReportsKey = getPublicReportsKey()
+
+    // Get total count
+    const total = await redis.zcard(publicReportsKey)
+
+    // Calculate offset
+    const offset = (page - 1) * limit
+
+    // Get report keys (most recent first)
+    const reportKeys = await redis.zrange(
+      publicReportsKey,
+      offset,
+      offset + limit - 1,
+      {
+        rev: true
+      }
+    )
+
+    if (reportKeys.length === 0) {
+      return { reports: [], total, hasMore: false }
+    }
+
+    const reports = await Promise.all(
+      reportKeys.map(async reportKey => {
+        const report = await redis.hgetall(reportKey)
+        return report
+      })
+    )
+
+    const parsedReports = reports
+      .filter((report): report is Record<string, any> => {
+        return report !== null && Object.keys(report).length > 0
+      })
+      .map(report => {
+        const plainReport = { ...report }
+        if (typeof plainReport.metadata === 'string') {
+          try {
+            plainReport.metadata = JSON.parse(plainReport.metadata)
+          } catch {
+            plainReport.metadata = {}
+          }
+        }
+        if (plainReport.createdAt && !(plainReport.createdAt instanceof Date)) {
+          plainReport.createdAt = new Date(plainReport.createdAt)
+        }
+        if (plainReport.updatedAt && !(plainReport.updatedAt instanceof Date)) {
+          plainReport.updatedAt = new Date(plainReport.updatedAt)
+        }
+        plainReport.isPublic = true
+        return plainReport as Report
+      })
+
+    return {
+      reports: parsedReports,
+      total,
+      hasMore: offset + limit < total
+    }
+  } catch (error) {
+    console.error('Error getting public reports:', error)
+    return { reports: [], total: 0, hasMore: false }
+  }
+}
+
+/**
+ * Toggle report public status
+ */
+export async function toggleReportPublic(
+  reportId: string,
+  userId: string,
+  isPublic: boolean
+): Promise<boolean> {
+  const result = await updateReport(reportId, userId, { isPublic })
+  return result !== null
 }

@@ -3,7 +3,10 @@
     "appTitle": "NaviX",
     "startResearch": "Start Research",
     "myReports": "My Reports",
-    "history": "History"
+    "history": "History",
+    "discovery": "Discovery",
+    "expert": "Expert",
+    "admin": "Admin"
   },
   "buttons": {
     "save": "Save",
@@ -60,7 +63,34 @@
     "loginPromptTitle": "Please sign in to ask questions",
     "loginPromptMessage": "Join us and start your research journey",
     "loginPromptDescription": "Sign in to save your search history, generate reports, and manage your questions anytime",
-    "continueAsGuest": "Continue as Guest"
+    "continueAsGuest": "Continue as Guest",
+    "phone": "Phone Number",
+    "phoneHint": "Enter your phone number, e.g., 13800138000",
+    "sendCode": "Send Code",
+    "sendingCode": "Sending...",
+    "verificationCode": "Verification Code",
+    "otpSentTo": "Code sent to",
+    "verify": "Verify",
+    "verifying": "Verifying...",
+    "verifyAndSignUp": "Verify & Sign Up",
+    "changePhone": "Change Phone",
+    "resendCode": "Resend Code",
+    "resendIn": "Resend in {seconds}s",
+    "useEmailLogin": "Use Email Login",
+    "usePhoneLogin": "Use Phone Login",
+    "useEmailSignUp": "Use Email Sign Up",
+    "usePhoneSignUp": "Use Phone Sign Up",
+    "enterPhoneToGetStarted": "Enter your phone number to get started",
+    "sendOtpError": "Failed to send verification code, please try again",
+    "verifyOtpError": "Failed to verify code, please try again",
+    "phoneRequired": "Please enter a valid phone number",
+    "otpRequired": "Please enter the 6-digit verification code",
+    "sendCodeFirst": "Please get the verification code first",
+    "inviteCode": "Invite Code",
+    "optional": "Optional",
+    "inviteCodeValid": "Valid",
+    "inviteCodeInvalid": "Invalid",
+    "inviteCodeHint": "Have an invite code? Enter it to get full access"
   },
   "userMenu": {
     "theme": "Theme",
@@ -72,7 +102,10 @@
     "openMenu": "Open menu",
     "language": "Language",
     "defaultUser": "User",
-    "defaultInitial": "U"
+    "defaultInitial": "U",
+    "profile": "Profile",
+    "admin": "Admin",
+    "quotaRemaining": "Remaining"
   },
   "guestMenu": {
     "signIn": "Sign In"
@@ -85,11 +118,27 @@
     "retry": "Retry",
     "search": "Search"
   },
+  "researchMode": {
+    "select": "Select Mode",
+    "none": "Normal Chat"
+  },
   "research": {
     "research": "Market Due Diligence",
     "deepResearch": "Deep Research",
     "questionSkipped": "Question skipped",
     "toggleDeepResearchMode": "Toggle deep research mode"
+  },
+  "homestay": {
+    "homestayResearch": "Homestay Research",
+    "tooltip": "Enable homestay investment due diligence mode for data-driven analysis",
+    "analysisResult": "Homestay Market Analysis Result",
+    "analyzing": "Analyzing homestay market...",
+    "analysisComplete": "Analysis complete",
+    "analysisFailed": "Analysis failed",
+    "noData": "No data available",
+    "model": "Model",
+    "tokens": "Token Usage",
+    "stopReason": "Stop Reason"
   },
   "questionConfirmation": {
     "selected": "Selected: ",
@@ -229,7 +278,10 @@
   },
   "placeholders": {
     "emailPlaceholder": "you@example.com",
-    "passwordPlaceholder": "********"
+    "passwordPlaceholder": "********",
+    "phonePlaceholder": "13800138000",
+    "otpPlaceholder": "Enter 6-digit code",
+    "inviteCodePlaceholder": "ABCD1234"
   },
   "accessibility": {
     "retryFromMessage": "Retry from message {messageId}",
@@ -253,5 +305,144 @@
     "industryPlaceholder": "e.g., Technology, Manufacturing, Consumer Goods, Finance, etc.",
     "additionalRequirements": "Additional Requirements",
     "additionalRequirementsPlaceholder": "Please describe your specific analysis needs (optional)"
+  },
+  "quota": {
+    "remaining": "Remaining Quota",
+    "used": "Used",
+    "limit": "Quota Limit",
+    "exhausted": "Quota Exhausted",
+    "upgradePrompt": "Upgrade for more quota",
+    "unlimited": "Unlimited",
+    "resetDate": "Reset Date"
+  },
+  "level": {
+    "free": "Free",
+    "pro": "Pro",
+    "vip": "VIP",
+    "admin": "Admin",
+    "expiresAt": "Expires at",
+    "permanent": "Permanent"
+  },
+  "admin": {
+    "title": "Admin Dashboard",
+    "dashboard": "Dashboard",
+    "users": "Users",
+    "updateLevel": "Update Level",
+    "userList": "User List",
+    "totalUsers": "{count} users in total",
+    "search": "Search users...",
+    "mobile": "Phone",
+    "level": "Level",
+    "quotaUsed": "Quota Used",
+    "createdAt": "Created At",
+    "actions": "Actions",
+    "editLevel": "Edit Level",
+    "selectLevel": "Select Level",
+    "expireDate": "Expire Date",
+    "noExpire": "No Expiration",
+    "save": "Save",
+    "cancel": "Cancel",
+    "updateSuccess": "Updated successfully",
+    "updateFailed": "Update failed",
+    "noUsers": "No users",
+    "loading": "Loading..."
+  },
+  "profile": {
+    "title": "Profile",
+    "quotaDashboard": "Quota Usage",
+    "currentLevel": "Current Level",
+    "upgradeNow": "Upgrade Now",
+    "contactUs": "Contact Us",
+    "accountInfo": "Account Info",
+    "userId": "User ID",
+    "phone": "Phone",
+    "notBound": "Not bound",
+    "invite": {
+      "title": "My Invite Codes",
+      "description": "Invite friends to sign up and they'll get full user access. Each code is valid for 30 days.",
+      "invited": "Invited {count} people",
+      "created": "Created",
+      "used": "Used",
+      "available": "Available",
+      "generate": "Generate Code",
+      "generating": "Creating...",
+      "maxReached": "Max 10 active codes",
+      "createError": "Failed to create invite code",
+      "statusUsed": "Used",
+      "statusExpired": "Expired",
+      "statusAvailable": "Available",
+      "expires": "Expires",
+      "copy": "Copy",
+      "copied": "Copied",
+      "shareLink": "Share Link",
+      "noInvites": "No invite codes",
+      "noInvitesHint": "Click the button above to generate your first invite code"
+    }
+  },
+  "discovery": {
+    "title": "Discovery",
+    "subtitle": "Explore public reports from other users",
+    "publicReports": "Public Reports",
+    "startResearch": "Start My Research",
+    "noPublicReports": "No public reports yet",
+    "noPublicReportsMessage": "Be the first to share your research",
+    "makePublic": "Make Public",
+    "makePrivate": "Make Private",
+    "publicSwitch": "Publish to Discovery",
+    "viewReport": "View Report",
+    "author": "Author",
+    "anonymous": "Anonymous"
+  },
+  "expert": {
+    "title": "Expert Consultation",
+    "subtitle": "Get professional overseas expansion consulting services",
+    "contactForm": "Book a Consultation",
+    "wechatScan": "Scan WeChat QR Code",
+    "services": "Our Services",
+    "service1Title": "Market Entry Strategy",
+    "service1Desc": "Develop market entry strategies tailored to your target market",
+    "service2Title": "Localization Consulting",
+    "service2Desc": "Product, operation, and marketing localization solutions",
+    "service3Title": "Compliance & Legal",
+    "service3Desc": "Regulatory and policy compliance guidance for target markets",
+    "name": "Name",
+    "namePlaceholder": "Please enter your name",
+    "company": "Company",
+    "companyPlaceholder": "Please enter your company name",
+    "phone": "Phone",
+    "phonePlaceholder": "Please enter your phone number",
+    "email": "Email",
+    "emailPlaceholder": "Please enter your email address",
+    "consultationType": "Consultation Type",
+    "selectType": "Select type",
+    "typeMarket": "Market Entry Strategy",
+    "typeLocalization": "Localization Consulting",
+    "typeLegal": "Compliance & Legal",
+    "typeOther": "Other",
+    "description": "Description",
+    "descriptionPlaceholder": "Please briefly describe your consultation needs",
+    "submit": "Submit",
+    "submitting": "Submitting...",
+    "submitSuccess": "Submitted successfully, we will contact you soon",
+    "submitFailed": "Submission failed, please try again",
+    "wechatTitle": "Scan QR Code",
+    "wechatDesc": "Scan to add our WeChat for instant consultation",
+    "wechatId": "WeChat ID"
+  },
+  "captcha": {
+    "title": "Captcha",
+    "subtitle": "Please solve the math problem",
+    "refresh": "Click to refresh",
+    "error": "Captcha error, please try again",
+    "placeholder": "Enter the answer",
+    "verifying": "Verifying...",
+    "verify": "Verify",
+    "required": "Please enter the captcha answer"
+  },
+  "errors": {
+    "quotaExceeded": "Quota exhausted, please upgrade for more usage",
+    "subscriptionExpired": "Subscription expired, please renew",
+    "forbidden": "Access denied",
+    "unauthorized": "Please sign in first"
   }
 }

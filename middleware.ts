@@ -1,4 +1,3 @@
-import { updateSession } from '@/lib/supabase/middleware'
 import { type NextRequest, NextResponse } from 'next/server'
 
 export async function middleware(request: NextRequest) {
@@ -13,21 +12,26 @@ export async function middleware(request: NextRequest) {
   // Construct the base URL - ensure protocol has :// format
   const baseUrl = `${protocol}${protocol.endsWith(':') ? '//' : '://'}${host}`
 
-  // Create a response
-  let response: NextResponse
+  // Better Auth session 检查 (通过 cookie)
+  // 注意：这里只检查 cookie 是否存在，详细验证在 API 层
+  const sessionCookie = request.cookies.get('better-auth.session_token')
+  const hasSession = !!sessionCookie?.value
 
-  // Handle Supabase session if configured
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  // 需要认证的路径
+  const protectedPaths = ['/profile', '/expert', '/admin']
+  const pathname = request.nextUrl.pathname
 
-  if (supabaseUrl && supabaseAnonKey) {
-    response = await updateSession(request)
-  } else {
-    // If Supabase is not configured, just pass the request through
-    response = NextResponse.next({
-      request
-    })
+  // 检查是否需要认证
+  const isProtected = protectedPaths.some(path => pathname.startsWith(path))
+
+  if (isProtected && !hasSession) {
+    const url = request.nextUrl.clone()
+    url.pathname = '/auth/login'
+    url.searchParams.set('returnUrl', pathname)
+    return NextResponse.redirect(url)
   }
+
+  const response = NextResponse.next({ request })
 
   // Add request information to response headers
   response.headers.set('x-url', request.url)

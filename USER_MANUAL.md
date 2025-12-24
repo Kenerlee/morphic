@@ -573,6 +573,80 @@ AI: [提供对比分析]
 - 🔔 **GitHub**：https://github.com/miurla/morphic
 - 📰 **更新公告**：在应用内查看最新功能
 
+#### 2025-12-06 系统维护记录
+
+**问题现象**：网站 https://navixcn.moments.top 返回 502 Bad Gateway 错误
+
+**问题原因**：服务器上 `node_modules` 损坏，Next.js 依赖文件缺失（`comment-json/index.js`），导致应用不断崩溃重启（累计重启 1200+ 次）
+
+**修复步骤**：
+1. SSH 登录服务器，执行 `pm2 stop morphic`
+2. 删除损坏的依赖：`rm -rf node_modules package-lock.json`
+3. 重新安装依赖：`npm install`
+4. 修复 TypeScript 类型错误（`lib/supabase/middleware.ts` 和 `lib/supabase/server.ts` 中的 `cookiesToSet` 参数类型）
+5. 重新构建：`npm run build`
+6. 重启应用：`pm2 restart morphic`
+
+**服务器信息**：
+- **服务器 IP**：14.103.248.138
+- **SSH 密钥路径**：`/Users/xxXxx/GenAI2025/NaviX/key1010.pem`
+- **项目目录**：`/root/morphic`
+- **SSH 登录命令**：`ssh -i "/Users/xxXxx/GenAI2025/NaviX/key1010.pem" root@14.103.248.138`
+
+**修复结果**：网站恢复正常，返回 HTTP 200 OK
+
+#### 2025-12-06 服务器健康检查与安全加固
+
+**维护类型**：日常健康检查与安全加固
+
+**检查项目与结果**：
+
+| 检查项 | 状态 | 详情 |
+|--------|------|------|
+| CPU | ⚠️ 较高 | 负载 2.67，使用率 92%（重启后正常） |
+| 内存 | ✅ 正常 | 5.0GB/7.8GB（64%），可用 2.4GB |
+| 磁盘 | ✅ 正常 | 清理前 41%，清理后 36% |
+| PM2 应用 | ✅ 运行中 | uptime 正常，内存 57.6MB |
+| Nginx | ✅ 运行中 | 反向代理正常 |
+
+**清理操作**：
+- PM2 日志清理：释放 18MB
+- npm 缓存清理：释放 921MB
+- apt 缓存清理：已完成
+- PM2 重启计数器：从 1255 重置为 0
+
+**安全发现与加固**：
+
+1. **SSH 暴力破解攻击**
+   - 发现攻击者 IP：80.190.82.187 正在尝试暴力破解
+   - 解决方案：安装并配置 fail2ban
+
+2. **fail2ban 安装与配置**
+   ```bash
+   apt install fail2ban -y
+   systemctl enable fail2ban
+   systemctl start fail2ban
+   ```
+   - 配置文件：`/etc/fail2ban/jail.local`
+   - SSH 防护：5次失败后封禁1小时
+   - 攻击者 IP 已被自动封禁
+
+3. **apt 公钥修复**
+   ```bash
+   apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 3B4FE6ACC0B21F32 871920D1991BC93C
+   ```
+
+4. **系统安全更新**
+   - 更新包数量：214 个
+   - 更新状态：全部完成
+
+**最终服务器状态**：
+- 应用 (morphic)：✅ 运行中，0次重启
+- 磁盘使用：42%（7.6GB/20GB）
+- fail2ban：✅ 运行中，保护 SSH
+- 系统版本：Ubuntu 20.04.6 LTS
+- 待更新包：0
+
 ---
 
 ## 最佳实践总结

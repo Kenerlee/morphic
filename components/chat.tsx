@@ -63,6 +63,14 @@ export function Chat({
     body: {
       id
     },
+    // Custom fetch to ensure long-running requests don't timeout
+    // Note: Avoid using AbortController timeout as it can prematurely cancel Skills API calls
+    fetch: async (input, init) => {
+      return fetch(input, {
+        ...init,
+        // Don't use keepalive: true as it limits request body size to 64KB
+      })
+    },
     onFinish: () => {
       // Only update URL if we're on the home page (new chat)
       // Don't update if we're already on a search page to avoid hijacking navigation

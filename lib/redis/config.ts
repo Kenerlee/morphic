@@ -39,8 +39,13 @@ export class RedisWrapper {
       const redisClient = this.client as RedisClientType
       try {
         if (options?.rev) {
-          // Use ZREVRANGE for reverse order in Redis 6.x
-          result = await redisClient.sendCommand(['ZREVRANGE', key, String(start), String(stop)]) as string[]
+          // Use ZREVRANGE for reverse order in Redis 5.x/6.x
+          result = (await redisClient.sendCommand([
+            'ZREVRANGE',
+            key,
+            String(start),
+            String(stop)
+          ])) as string[]
         } else {
           result = await redisClient.zRange(key, start, stop)
         }
@@ -66,7 +71,10 @@ export class RedisWrapper {
       for (const [k, v] of Object.entries(result)) {
         try {
           // Try to parse as JSON if it looks like JSON
-          if (typeof v === 'string' && (v.startsWith('{') || v.startsWith('['))) {
+          if (
+            typeof v === 'string' &&
+            (v.startsWith('{') || v.startsWith('['))
+          ) {
             parsed[k] = JSON.parse(v)
           } else {
             parsed[k] = v
@@ -122,6 +130,26 @@ export class RedisWrapper {
       return this.client.zrem(key, member)
     } else {
       return (this.client as RedisClientType).zRem(key, member)
+    }
+  }
+
+  async zcard(key: string): Promise<number> {
+    if (this.client instanceof Redis) {
+      return this.client.zcard(key)
+    } else {
+      return (this.client as RedisClientType).zCard(key)
+    }
+  }
+
+  async hincrby(
+    key: string,
+    field: string,
+    increment: number
+  ): Promise<number> {
+    if (this.client instanceof Redis) {
+      return this.client.hincrby(key, field, increment)
+    } else {
+      return (this.client as RedisClientType).hIncrBy(key, field, increment)
     }
   }
 

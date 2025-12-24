@@ -39,3 +39,10 @@ next-env.d.ts
 .tmp/
 # Local Netlify folder
 .netlify
+.env.production
+
+# Backup files with secrets
+scripts/env.backup.txt
+SkillsApi/.claude.json.backup
+SkillsApi/.claude.json
+*.backup

@@ -2,9 +2,12 @@
 
 import React, { useEffect, useState } from 'react'
 
+import { Menu } from 'lucide-react'
+
 import { useMediaQuery } from '@/lib/hooks/use-media-query'
 import { cn } from '@/lib/utils'
 
+import { Button } from '@/components/ui/button'
 import {
   ResizableHandle,
   ResizablePanel,
@@ -24,7 +27,12 @@ export function ChatArtifactContainer({
   const { state } = useArtifact()
   const isMobile = useMediaQuery('(max-width: 767px)') // Below md breakpoint
   const [renderPanel, setRenderPanel] = useState(state.isOpen)
-  const { open, openMobile, isMobile: isMobileSidebar } = useSidebar()
+  const {
+    open,
+    openMobile,
+    isMobile: isMobileSidebar,
+    toggleSidebar
+  } = useSidebar()
 
   useEffect(() => {
     if (state.isOpen) {
@@ -36,10 +44,22 @@ export function ChatArtifactContainer({
 
   return (
     <div className="flex-1 min-h-0 h-screen flex">
-      <div className="absolute p-4 z-50 transition-opacity duration-1000">
-        {(!open || isMobileSidebar) && (
-          <SidebarTrigger className="animate-fade-in" />
-        )}
+      {/* Mobile hamburger menu button - visible when sidebar is closed on mobile */}
+      {isMobile && !openMobile && (
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => toggleSidebar()}
+          className="fixed top-3 left-3 z-50 size-10 bg-background/80 backdrop-blur-sm border shadow-sm md:hidden mobile-menu"
+          aria-label="Menu"
+          data-testid="mobile-menu-button"
+        >
+          <Menu className="size-5" />
+        </Button>
+      )}
+      {/* Desktop sidebar trigger - visible when sidebar is closed on desktop */}
+      <div className="absolute p-4 z-50 transition-opacity duration-1000 hidden md:block">
+        {!open && <SidebarTrigger className="animate-fade-in" />}
       </div>
       {/* Desktop: Resizable panels (Do not render on mobile) */}
       {!isMobile && (

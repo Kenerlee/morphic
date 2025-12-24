@@ -7,6 +7,7 @@ import {
 } from 'ai'
 
 import { deepResearcher } from '@/lib/agents/deep-researcher'
+import { homestayDueDiligenceAgent } from '@/lib/agents/homestay-due-diligence-agent'
 import { marketDueDiligenceAgent } from '@/lib/agents/market-due-diligence-agent'
 import { researcher } from '@/lib/agents/researcher'
 
@@ -39,6 +40,7 @@ export function createToolCallingStreamResponse(config: BaseStreamConfig) {
         searchMode,
         dueDiligenceMode,
         deepResearchMode,
+        homestayMode,
         userId
       } = config
       const modelId = `${model.providerId}:${model.id}`
@@ -55,16 +57,21 @@ export function createToolCallingStreamResponse(config: BaseStreamConfig) {
               messages: truncatedMessages,
               model: modelId
             })
-          : dueDiligenceMode
-            ? await marketDueDiligenceAgent({
+          : homestayMode
+            ? homestayDueDiligenceAgent({
                 messages: truncatedMessages,
                 model: modelId
               })
-            : await researcher({
-                messages: truncatedMessages,
-                model: modelId,
-                searchMode
-              })
+            : dueDiligenceMode
+              ? marketDueDiligenceAgent({
+                  messages: truncatedMessages,
+                  model: modelId
+                })
+              : await researcher({
+                  messages: truncatedMessages,
+                  model: modelId,
+                  searchMode
+                })
 
         const result = streamText({
           ...researcherConfig,

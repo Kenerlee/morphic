@@ -9,5 +9,6 @@ export interface BaseStreamConfig {
   searchMode: boolean
   dueDiligenceMode: boolean
   deepResearchMode: boolean
+  homestayMode: boolean
   userId: string
 }

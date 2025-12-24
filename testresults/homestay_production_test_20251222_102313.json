@@ -1,0 +1,85 @@
+{
+  "title": "民宿尽调生产环境 E2E 测试报告",
+  "timestamp": "2025-12-22T10:23:13.223423",
+  "environment": "https://skills-api-proxy-1.onrender.com",
+  "skill_id": "skill_015FtmDcs3NUKhwqTgukAyWc",
+  "summary": {
+    "total": 10,
+    "passed": 5,
+    "failed": 5,
+    "pass_rate": "50.0%"
+  },
+  "results": [
+    {
+      "name": "健康检查",
+      "status": "PASS",
+      "duration": 1.5453619956970215,
+      "details": "",
+      "timestamp": "2025-12-22T10:19:22.694890"
+    },
+    {
+      "name": "Skills 列表",
+      "status": "PASS",
+      "duration": 1.4769537448883057,
+      "details": "共 6 个 skills",
+      "timestamp": "2025-12-22T10:19:24.172606"
+    },
+    {
+      "name": "民宿 Skill 信息验证",
+      "status": "PASS",
+      "duration": 1.1721367835998535,
+      "details": "",
+      "timestamp": "2025-12-22T10:19:25.346796"
+    },
+    {
+      "name": "无效 Skill ID 处理",
+      "status": "PASS",
+      "duration": 1.1439330577850342,
+      "details": "正确返回 400",
+      "timestamp": "2025-12-22T10:19:26.492431"
+    },
+    {
+      "name": "空消息处理",
+      "status": "FAIL",
+      "duration": 1.470531940460205,
+      "details": "返回 500",
+      "timestamp": "2025-12-22T10:19:27.964398"
+    },
+    {
+      "name": "民宿基础调用",
+      "status": "PASS",
+      "duration": 32.814212799072266,
+      "details": "响应 51 字符",
+      "timestamp": "2025-12-22T10:20:00.780445"
+    },
+    {
+      "name": "民宿市场分析",
+      "status": "FAIL",
+      "duration": 60.494905948638916,
+      "details": "('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))",
+      "timestamp": "2025-12-22T10:21:01.276223"
+    },
+    {
+      "name": "流式端点",
+      "status": "FAIL",
+      "duration": 60.471683979034424,
+      "details": "('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))",
+      "timestamp": "2025-12-22T10:22:01.748151"
+    },
+    {
+      "name": "PDF Skill",
+      "status": "FAIL",
+      "duration": 60.7320818901062,
+      "details": "('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))",
+      "timestamp": "2025-12-22T10:23:02.480375"
+    },
+    {
+      "name": "并发请求 (3 个)",
+      "status": "FAIL",
+      "duration": 10.736483097076416,
+      "details": "HTTPSConnectionPool(host='skills-api-proxy-1.onrender.com', port=443): Read timed out. (read timeout=10)",
+      "timestamp": "2025-12-22T10:23:13.223145"
+    }
+  ],
+  "sample_report": ""
+}
